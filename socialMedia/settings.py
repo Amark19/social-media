@@ -74,10 +74,20 @@ WSGI_APPLICATION = 'socialMedia.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#     }
+# }
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'socialMedia',
+        'USER': 'admin',
+        'PASSWORD': 'pass1234',
+        'HOST': 'sblminiproj.ctxz5c1vx3bo.us-east-1.rds.amazonaws.com',
+        'PORT': '3306',
     }
 }
 
