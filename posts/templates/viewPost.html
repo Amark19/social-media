@@ -1,0 +1,117 @@
+{% extends 'baseTemplate.html' %}
+{% block css %}
+/* width */
+::-webkit-scrollbar {
+width: 10px;
+}
+/* Track */
+::-webkit-scrollbar-track {
+box-shadow: inset 0 0 5px #DFDFDF;
+border-radius: 3px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+background: #C0C0C0;
+border-radius: 3px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+background: #C0C0C0;
+}
+{% endblock %}
+{% block body %}
+<div class="container">
+    <div class="row border border-1">
+        <div class="col-md-7 bg-light border border-1">
+            <div class="text-white rounded-3 d-flex justify-content-center align-items-center" style="height:600px;">
+                <img src="/media/{{ post.media }}" alt="loading-post" style="max-height: 100%;
+                max-width: 100%;
+                background-repeat: no-repeat;
+                background-position: center;" />
+            </div>
+        </div>
+        <div class="col-md-5 border border-1 ">
+            <div class="header">
+                <div class="d-flex text-muted pt-3">
+                    <img class="rounded-circle" width="32px" height="32px" src="/media/{{user_data.0.user_pic}}"
+                        style="object-fit: cover;" alt="">
+                    <div class="pb-3 mb-2 mx-2 small lh-sm  w-100">
+                        <div class="d-flex justify-content-between">
+                            <strong class="fs-6">{{request.user}}</strong>
+                            <a href="#">More</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div class="body" style="max-height:400px;overflow-y: scroll;overflow-x:hidden;">
+                <div class="caption">
+                    <div class="d-flex text-muted pt-3">
+                        <img class="rounded-circle" width="32px" height="32px" src="/media/{{user_data.0.user_pic}}"
+                            style="object-fit: cover;" alt="">
+                        <div class="pb-3 mb-2 mx-2 small lh-sm  w-100">
+                            <div class="d-flex justify-content-between">
+                                <strong class="fs-6">{{request.user}} <span>
+                                        <p class="mt-2 fw-normal">{{post.content}}</p>
+                                    </span></strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row d-flex justify-content-center">
+                    <div class="card shadow-0 border">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <p>Type your note, and hit enter to add it</p>
+                                <div class="d-flex justify-content-between">
+                                    <div class="d-flex flex-row align-items-center">
+                                        <img src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/img%20(4).webp"
+                                            alt="avatar" width="25" height="25" />
+                                        <p class="small mb-0 ms-2">Martha</p>
+                                    </div>
+                                    <div class="d-flex flex-row align-items-center">
+                                        <p class="small text-muted mb-0">Like</p>
+                                        <p class="small mx-2 text-muted mb-0">reply</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <p>Type your note, and hit enter to add it</p>
+                                <div class="d-flex justify-content-between">
+                                    <div class="d-flex flex-row align-items-center">
+                                        <img src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/img%20(4).webp"
+                                            alt="avatar" width="25" height="25" />
+                                        <p class="small mb-0 ms-2">Martha</p>
+                                    </div>
+                                    <div class="d-flex flex-row align-items-center">
+                                        <p class="small text-muted mb-0">Like</p>
+                                        <p class="small mx-2 text-muted mb-0">reply</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer my-5">
+                <div class="buttons d-flex justify-content-start">
+                    <a type="button" class="btn-sm mx-2"><img src="/static/like.svg" width="32px" height="32px" alt=""></a>
+                    <button type="button" class="btn btn-outline-primary btn-sm mx-2">Comment</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm mx-2">Share</button>
+                </div>
+                
+                <strong class="mx-2 mt-2">{{post.likes}} likes</strong>
+                <div class="input-group mt-4">
+                    <input type="text" class="form-control" placeholder="Add a comment"
+                        aria-label="Recipient's username" aria-describedby="button-addon2">
+                    <button class="btn btn-outline-primary" type="button" id="button-addon2">Post</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
