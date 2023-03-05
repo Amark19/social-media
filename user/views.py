@@ -1,123 +1,132 @@
 
-from django.shortcuts import render,HttpResponse,redirect
-from django.urls import reverse
+from django.shortcuts import render, HttpResponse, redirect
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from .models import userData
-from django.contrib.auth import authenticate, login,logout
+from posts.models import Post
+from django.contrib.auth import authenticate, login, logout
 import json
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
+from .utils import user_data
+from posts.utils import post_util
 # Create your views here.
-islogout=False
-isregister=False
-def get_user_data(r):
-    global user_data
-    user_data=userData.objects.values('name','user_desc','user_email','user_phone','user_birthday','user_pic').filter(user_name=r.user.username)
-    # if userData.objects.values('user_pic').filter(user_name=r.user.username)
-    return user_data
+islogout = False
+isregister = False
+
+
 def login_user(request):
     global isregister
-    login_valid=False
+    login_valid = False
     if request.method == "POST":
-        username=request.POST["username"]
-        passw=request.POST["password"]
-        user=authenticate(request,username=username,password=passw)
+        username = request.POST["username"]
+        passw = request.POST["password"]
+        user = authenticate(request, username=username, password=passw)
         if user is not None:
-            login(request,user)
+            login(request, user)
             return redirect('/')
         else:
-            
-            isregister=False
-            login_valid=True
-            return render(request,'login.html',{'isregister':isregister,'login_valid':login_valid})
-    return render(request,'login.html',{'isregister':isregister,'login_valid':login_valid})
+            isregister = False
+            login_valid = True
+            return render(request, 'authentication/login.html', {'isregister': isregister, 'login_valid': login_valid})
+    return render(request, 'authentication/login.html', {'isregister': isregister, 'login_valid': login_valid})
+
 
 def register(request):
     global isregister
     if request.method == "POST":
-        username=request.POST["username"]   
+        username = request.POST["username"]
         request.session['username'] = username
-        passw=request.POST["password"]
-        user=User.objects.create_user(username,username,passw)
+        passw = request.POST["password"]
+        user = User.objects.create_user(username, username, passw)
         user.save()
         name = request.POST['name']
         bio = request.POST['bio']
         email = request.POST['email']
         phoneno = request.POST['phonen']
         date = request.POST['bdate']
-        pic=request.FILES.get('pic',False)
-        pic.name=username+'.jpg'
-        userData.objects.create(user_name=str(username),name=name,user_desc=bio,user_email=email,user_phone=str(phoneno),user_birthday=date,user_pic=pic)
-        isregister=True
+        pic = request.FILES.get('pic', False)
+        pic.name = username+'.jpg'
+        userData.objects.create(user_name=str(username), name=name, user_desc=bio,
+                                user_email=email, user_phone=str(phoneno), user_birthday=date, user_pic=pic)
+        isregister = True
         return redirect('login/')
-    
+
     else:
-        isregister=False
+        isregister = False
         all_username = User.objects.all()
         all_username = [i.username for i in all_username]
-        return render(request,'register.html',{'all_username':json.dumps(all_username)})
+        return render(request, 'authentication/register.html', {'all_username': json.dumps(all_username)})
 
-        
-    return render(request,'register.html')
 
-from django.views.decorators.cache import cache_control
-
-@cache_control(no_cache=True, must_revalidate=True)
+@login_required(login_url='login')
 def logout_user(request):
     if request.user.is_authenticated:
         logout(request)
-        
-        islogout=True
-        messages.success(request,"Logged out successfully")
+        messages.success(request, "Logged out successfully")
         return redirect("/login")
 
-@cache_control(no_cache=True, must_revalidate=True)
+
+@login_required(login_url='login')
 def home(request):
     if not request.user.is_authenticated:
-
         return redirect('/login')
     elif request.user.is_authenticated:
-        print(get_user_data(request))
-        return render(request,'baseTemplate.html',{'profile_pic':get_user_data(request)[0]['user_pic']})
+        return render(request, 'baseTemplate.html', {'user_data': user_data.get_user_data(request)})
 
-def profile(request,username):
+
+@login_required(login_url='login')
+def profile(request, username):
     if not request.user.is_authenticated:
         return redirect('/login')
-    elif username==request.user.username:
-        return render(request,'profile.html',{'user_data':get_user_data(request),'profile_pic':get_user_data(request)[0]['user_pic']})
+    elif username in User.objects.values_list('username', flat=True):
+        #user django object from username
+        userObj = user_data.get_user_data(username)
+        post_data = post_util.get_post_data(request) 
+        print(type(request.user))
+        print(userObj)
+        posts_length = len(post_data)
+        if username == request.user.username:
+            return render(request, 'profile/index.html', {'user_data': userObj, 'post_data': post_data, 'post_length': str(posts_length), 'profile_pic': userObj[0]['user_pic']})
+        else:
+            return HttpResponse("200 user found")
     else:
         return HttpResponse("404 not found")
 
+
+@login_required(login_url='login')
 @csrf_exempt
 def edit_profile(request):
     if request.method == 'POST':
         if 'image' in request.FILES:
             from PIL import Image
-            pic=request.FILES['image']
-            Image.open(pic).save('media/'+ pic.name)
-            userData.objects.filter(user_name=request.user.username).update(user_pic=pic)
+            pic = request.FILES['image']
+            Image.open(pic).save('media/' + pic.name)
+            userData.objects.filter(
+                user_name=request.user.username)
+            userData.user_pic = pic;
+            userData.save()
         elif 'name' in request.POST:
             name = request.POST['name']
             bio = request.POST['bio']
             email = request.POST['email']
             phoneN = request.POST['phoneN']
-            userData.objects.filter(user_name=request.user.username).update(name=name,user_desc=bio,user_email=email,user_phone=phoneN)
-            # userData.objects.filter(user_name=request.user.username).update(user_pic=False)
-        return render(request,'editProfile.html',{'user_data':get_user_data(request),'profile_pic':get_user_data(request)[0]['user_pic'],'isupdate':True})
-    return render(request,'editProfile.html',{'user_data':get_user_data(request),'profile_pic':get_user_data(request)[0]['user_pic'],'isupdate':False})
+            userData.objects.filter(user_name=request.user.username).update(
+                name=name, user_desc=bio, user_email=email, user_phone=phoneN)
+        return render(request, 'usersettings/editProfile.html', {'user_data': user_data.get_user_data(request), 'profile_pic': user_data.get_user_data(request)[0]['user_pic'], 'isupdate': True})
+    return render(request, 'usersettings/editProfile.html', {'user_data': user_data.get_user_data(request), 'profile_pic': user_data.get_user_data(request)[0]['user_pic'], 'isupdate': False})
+
 
 def changePassword(request):
     if request.method == "POST":
         old_pass = request.POST['old_pass']
         new_pass = request.POST['new_pass']
-        user = authenticate(request,username=request.user.username,password=old_pass)
+        user = authenticate(
+            request, username=request.user.username, password=old_pass)
         if user is not None:
             user.set_password(new_pass)
             user.save()
             return redirect('/login')
         else:
-            
-            return render(request,'changepassword.html',{'profile_pic':get_user_data(request)[0]['user_pic'],'ispassValid':True})
-   
-
-    return render(request,'changepassword.html',{'profile_pic':get_user_data(request)[0]['user_pic'],'ispassValid':False})
+            return render(request, 'usersettings/changepassword.html', {'profile_pic': user_data.get_user_data(request)[0]['user_pic'], 'ispassValid': True})
+    return render(request, 'usersettings/changepassword.html', {'profile_pic': user_data.get_user_data(request)[0]['user_pic'], 'ispassValid': False})

@@ -1,0 +1,20 @@
+{% if post_data|length > 0 %}
+  <div class="row my-4">
+    {% for post in post_data %}
+      <div class="col-md-4 mt-3 post">
+          <a href="/post/{{post.post_id}}">
+            <div class="text-white bg-light rounded-3 d-flex justify-content-center align-items-center" style="height:300px;">
+              <img src="/media/{{ post.media }}" alt="loading-post" style="max-height: 100%;
+              max-width: 100%;
+              background-repeat: no-repeat;
+              background-position: center;" />
+            </div>
+        </a>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="d-flex justify-content-center my-5">
+    <h4 class="text-secondary">There is nothing to show here</h4>
+  </div>
+{% endif %}
