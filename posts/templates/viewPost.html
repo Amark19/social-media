@@ -61,57 +61,116 @@ background: #C0C0C0;
                     </div>
                 </div>
                 <div class="row d-flex justify-content-center">
-                    <div class="card shadow-0 border">
+                    <div class="card shadow-0 border" id="comment-section">
+                        {% for data in comments_data %}
                         <div class="card mb-4">
                             <div class="card-body">
-                                <p>Type your note, and hit enter to add it</p>
+                                <p>{{data.comment}}</p>
                                 <div class="d-flex justify-content-between">
                                     <div class="d-flex flex-row align-items-center">
-                                        <img src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/img%20(4).webp"
-                                            alt="avatar" width="25" height="25" />
-                                        <p class="small mb-0 ms-2">Martha</p>
+                                        <img class="rounded-circle" width="32px" height="32px"
+                                            src="/media/{{ data.user_pic }}" alt="avatar" style="object-fit: cover;" />
+                                        <a href="/{{data.user_name}}/" class="small mb-0 ms-2 ">{{data.user_name}}</a>
                                     </div>
                                     <div class="d-flex flex-row align-items-center">
-                                        <p class="small text-muted mb-0">Like</p>
-                                        <p class="small mx-2 text-muted mb-0">reply</p>
+                                        <p class="small text-muted mb-0">{{data.time_ago}}</p>
+                                        <a id="like-{{forloop.counter}}" type="submit" class="btn-sm"><img src="/static/like.svg" width="20px"
+                                            height="20px" alt=""></a>
+                                        <a type="button" class="btn-sm"><img
+                                                src="/static/comment.svg" width="20px" height="20px" alt=""></a>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="card mb-4">
-                            <div class="card-body">
-                                <p>Type your note, and hit enter to add it</p>
-                                <div class="d-flex justify-content-between">
-                                    <div class="d-flex flex-row align-items-center">
-                                        <img src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/img%20(4).webp"
-                                            alt="avatar" width="25" height="25" />
-                                        <p class="small mb-0 ms-2">Martha</p>
-                                    </div>
-                                    <div class="d-flex flex-row align-items-center">
-                                        <p class="small text-muted mb-0">Like</p>
-                                        <p class="small mx-2 text-muted mb-0">reply</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
-            <div class="footer my-5">
-                <div class="buttons d-flex justify-content-start">
-                    <a type="button" class="btn-sm mx-2"><img src="/static/like.svg" width="32px" height="32px" alt=""></a>
-                    <button type="button" class="btn btn-outline-primary btn-sm mx-2">Comment</button>
-                    <button type="button" class="btn btn-outline-primary btn-sm mx-2">Share</button>
-                </div>
-                
-                <strong class="mx-2 mt-2">{{post.likes}} likes</strong>
-                <div class="input-group mt-4">
-                    <input type="text" class="form-control" placeholder="Add a comment"
-                        aria-label="Recipient's username" aria-describedby="button-addon2">
-                    <button class="btn btn-outline-primary" type="button" id="button-addon2">Post</button>
-                </div>
-            </div>
+            <form method='post' id='post-data'>
+                {% csrf_token %}
+                <div class="footer my-5">
+                    <div class="buttons d-flex justify-content-start mb-2">
+                        <a id="like" type="submit" class="btn-sm mx-2" >
+                            {% if not is_like %}
+                                <img src="/static/like.svg" width="32px" height="32px" alt="">
+                            {% else %}  
+                                <img src="/static/liked.svg" width="32px" height="32px" alt="">
+                            {% endif %}
+                        </a>
+                        <a type="button" class="btn-sm mx-2" onclick="$('#comment-input').focus()">
+                            <img src="/static/comment.svg" width="32px" height="32px" alt="">
+                        </a>
+                        <a type="button" class="btn-sm mx-2">
+                            <img src="/static/share.svg" width="32px" height="32px" alt="">
+                        </a>
+                    </div>
+
+                    <strong id="likes-count" class="mx-2 mb-2">{{post.likes.count}} likes</strong>
+                    <div class="input-group mt-3 mb-0">
+                        <input type="text" class="form-control" placeholder="Add a comment" id="comment-input"
+                            aria-label="Recipient's username" aria-describedby="button-addon2">
+                        <button class="btn btn-outline-primary" type="submit" id="comment">Post</button>
+                    </div>
+            </form>
         </div>
     </div>
 </div>
+</div>
+<script src="/static/utils/ajax_req.js" type="text/javascript"></script>
+<script>
+    const data = {{ post_json | safe }};
+    let post_data = data[0].fields;
+    $(document).ready(function () {
+        $("#like").click(function (e) {
+            make_req('POST', '/post/updatePost/', {
+                'post_id': data[0].pk,
+                'update_type': 'like'
+            }, function (data) {
+                if(!data.is_like){
+                    $('#like').html(`<img src="/static/liked.svg" width="32px" height="32px" alt="">`);
+                }
+                else{
+                    $('#like').html(`<img src="/static/like.svg" width="32px" height="32px" alt="">`);
+                }
+                $('#likes-count').text(data.likes_count + ' likes');
+            });
+        });
+        $("#comment").click(function (e) {
+            e.preventDefault();
+            make_req('POST', '/post/updatePost/', {
+                'post_id': data[0].pk,
+                'update_type': 'comment',
+                'comment': $('#comment-input').val()
+            }, function (data) {
+                $('#comment-section').empty();
+                data.map((element,index)=>{
+
+                    console.log("comments", element)
+                    $('#comment-section').append
+                        (`
+                            <div class="card mb-4">
+                                <div class="card-body">
+                                    <p>${element.comment}</p>
+                                    <div class="d-flex justify-content-between">
+                                        <div class="d-flex flex-row align-items-center">
+                                            <img class="rounded-circle" width="32px" height="32px" src=/media/${element.user_pic}
+                                            alt="avatar" style="object-fit: cover;"/>
+                                            <a href="/${element.user_name}/" class="small mb-0 ms-2 ">${element.user_name}</a>
+                                        </div>
+                                        <div class="d-flex flex-row align-items-center">
+                                            <p class="small text-muted mb-0">${element.time_ago}</p>
+                                            <a id="like-${index}" type="submit" class="btn-sm"><img src="/static/like.svg" width="20px"
+                                                height="20px" alt=""></a>
+                                            <a type="button" class="btn-sm"><img
+                                                src="/static/comment.svg" width="20px" height="20px" alt=""></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `)
+                });
+            });
+        });
+    });
+</script>
 {% endblock %}

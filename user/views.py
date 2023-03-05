@@ -72,17 +72,24 @@ def home(request):
     if not request.user.is_authenticated:
         return redirect('/login')
     elif request.user.is_authenticated:
-        return render(request, 'baseTemplate.html', {'profile_pic': user_data.get_user_data(request)[0]['user_pic']})
+        return render(request, 'baseTemplate.html', {'user_data': user_data.get_user_data(request)})
 
 
 @login_required(login_url='login')
 def profile(request, username):
     if not request.user.is_authenticated:
         return redirect('/login')
-    elif username == request.user.username:
-        post_data = post_util.get_post_data(request)
+    elif username in User.objects.values_list('username', flat=True):
+        #user django object from username
+        userObj = user_data.get_user_data(username)
+        post_data = post_util.get_post_data(request) 
+        print(type(request.user))
+        print(userObj)
         posts_length = len(post_data)
-        return render(request, 'profile/index.html', {'user_data': user_data.get_user_data(request), 'post_data': post_data, 'post_length': str(posts_length), 'profile_pic': user_data.get_user_data(request)[0]['user_pic']})
+        if username == request.user.username:
+            return render(request, 'profile/index.html', {'user_data': userObj, 'post_data': post_data, 'post_length': str(posts_length), 'profile_pic': userObj[0]['user_pic']})
+        else:
+            return HttpResponse("200 user found")
     else:
         return HttpResponse("404 not found")
 
@@ -96,7 +103,9 @@ def edit_profile(request):
             pic = request.FILES['image']
             Image.open(pic).save('media/' + pic.name)
             userData.objects.filter(
-                user_name=request.user.username).update(user_pic=pic)
+                user_name=request.user.username)
+            userData.user_pic = pic;
+            userData.save()
         elif 'name' in request.POST:
             name = request.POST['name']
             bio = request.POST['bio']
