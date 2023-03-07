@@ -14,6 +14,10 @@ from posts.utils import post_util
 islogout = False
 isregister = False
 
+def userObj(username):
+    userObj = user_data.get_user_data(username)[0]
+    return userObj
+
 
 def login_user(request):
     global isregister
@@ -72,7 +76,8 @@ def home(request):
     if not request.user.is_authenticated:
         return redirect('/login')
     elif request.user.is_authenticated:
-        return render(request, 'baseTemplate.html', {'user_data': user_data.get_user_data(request)})
+        username = request.user.username
+        return render(request, 'baseTemplate.html', {'user_data': userObj(username),'profile_pic': userObj(username)['user_pic']})
 
 
 @login_required(login_url='login')
@@ -80,16 +85,13 @@ def profile(request, username):
     if not request.user.is_authenticated:
         return redirect('/login')
     elif username in User.objects.values_list('username', flat=True):
-        #user django object from username
-        userObj = user_data.get_user_data(username)
-        post_data = post_util.get_post_data(request) 
-        print(type(request.user))
-        print(userObj)
+        post_data = post_util.get_post_data(username,include_likes=False)
         posts_length = len(post_data)
         if username == request.user.username:
-            return render(request, 'profile/index.html', {'user_data': userObj, 'post_data': post_data, 'post_length': str(posts_length), 'profile_pic': userObj[0]['user_pic']})
+            profile_pic = userObj(username)['user_pic']
         else:
-            return HttpResponse("200 user found")
+            profile_pic = userObj(request.user.username)['user_pic']
+        return render(request, 'profile/index.html', {'user_data': userObj(username), 'post_data': post_data, 'post_length': str(posts_length), 'profile_pic': profile_pic, 'searchedUserPic': userObj(username)['user_pic']})
     else:
         return HttpResponse("404 not found")
 
@@ -104,7 +106,7 @@ def edit_profile(request):
             Image.open(pic).save('media/' + pic.name)
             userData.objects.filter(
                 user_name=request.user.username)
-            userData.user_pic = pic;
+            userData.user_pic = pic
             userData.save()
         elif 'name' in request.POST:
             name = request.POST['name']
@@ -113,8 +115,8 @@ def edit_profile(request):
             phoneN = request.POST['phoneN']
             userData.objects.filter(user_name=request.user.username).update(
                 name=name, user_desc=bio, user_email=email, user_phone=phoneN)
-        return render(request, 'usersettings/editProfile.html', {'user_data': user_data.get_user_data(request), 'profile_pic': user_data.get_user_data(request)[0]['user_pic'], 'isupdate': True})
-    return render(request, 'usersettings/editProfile.html', {'user_data': user_data.get_user_data(request), 'profile_pic': user_data.get_user_data(request)[0]['user_pic'], 'isupdate': False})
+        return render(request, 'usersettings/editProfile.html', {'user_data': userObj(request.user.username), 'profile_pic':  userObj(request.user.username)['user_pic'], 'isupdate': True})
+    return render(request, 'usersettings/editProfile.html', {'user_data':  userObj(request.user.username), 'profile_pic':  userObj(request.user.username)['user_pic'], 'isupdate': False})
 
 
 def changePassword(request):
@@ -128,5 +130,5 @@ def changePassword(request):
             user.save()
             return redirect('/login')
         else:
-            return render(request, 'usersettings/changepassword.html', {'profile_pic': user_data.get_user_data(request)[0]['user_pic'], 'ispassValid': True})
-    return render(request, 'usersettings/changepassword.html', {'profile_pic': user_data.get_user_data(request)[0]['user_pic'], 'ispassValid': False})
+            return render(request, 'usersettings/changepassword.html', {'profile_pic': userObj(request.user.username)['user_pic'], 'ispassValid': True})
+    return render(request, 'usersettings/changepassword.html', {'profile_pic': userObj(request.user.username)['user_pic'], 'ispassValid': False})

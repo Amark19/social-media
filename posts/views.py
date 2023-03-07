@@ -7,13 +7,7 @@ import json
 from datetime import datetime, timezone
 from django.core import serializers
 from .utils import time_diff
-
-
-def get_user_data(r):
-    global user_data
-    user_data = userData.objects.values(
-        'name', 'user_desc', 'user_email', 'user_phone', 'user_birthday', 'user_pic').filter(user_name=r.user.username)
-    return user_data
+from user.utils import user_data
 
 
 def get_comments_data(all_comments):
@@ -27,7 +21,7 @@ def get_comments_data(all_comments):
             'time_ago': time_diff.time_diff(datetime.now(timezone.utc), all_comments[i].created_date)
         })
     # sorting comments by time_ago
-    
+
     return comments_data
 
 
@@ -36,7 +30,8 @@ def create_post(request):
     if request.method == 'POST':
         content = request.POST.get('content')
         media = request.FILES.get('media', False)
-        post = Post(content=content, media=media, user=request.user)
+        post = Post(content=content, media=media,
+                    user=request.user, username=request.user.username)
         post.save()
         return redirect(f'/{request.user}/')
 
@@ -66,10 +61,14 @@ def update_post(request):
 @login_required(login_url='login')
 def view_post(request, post_id):
     post = Post.objects.get(post_id=post_id)
+    userObj = user_data.get_user_data(post.username)[0]  # searched user name
+    authorObj = user_data.get_user_data(request.user.username)[
+        0]  # logged in user name
+    print(post.user)
     post_json = serializers.serialize(
         'json', [post,])
     if post.likes.filter(id=request.user.id).exists():
         is_like = 1
     else:
         is_like = 0
-    return render(request, 'viewPost.html', {'post': post, 'post_json': post_json, 'user_data': get_user_data(request),'is_like':is_like,'comments_data': get_comments_data(Comment.objects.filter(post=post).all())})
+    return render(request, 'viewPost.html', {'post': post, 'post_json': post_json, 'user_data': userObj, 'profile_pic': authorObj['user_pic'], 'is_like': is_like, 'comments_data': get_comments_data(Comment.objects.filter(post=post).all())})
