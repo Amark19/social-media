@@ -2,7 +2,11 @@
   <div class="container-fluid py-5">
     <div class="row">
       <div class="col-md-6">
-        <h2 class="display-5">{{ request.user }}<span class="mx-3"><a class="btn btn-outline-secondary text-dark" href="/accounts/edit/">edit profile</a></span></h2>
+        <h2 class="display-5">{{ user_data.user_name }}<span class="mx-3">
+          {% if request.user.username == user_data.user_name %}
+          <a class="btn btn-outline-secondary text-dark" href="/accounts/edit/">edit profile</a>
+          {% endif %}
+        </span></h2>
         <div class="row my-4 mb-4">
           <div class="col-md-3">
             <p class="fw-bold">21 posts</p>
@@ -14,12 +18,12 @@
             <p class="fw-bold">43 Following</p>
           </div>
         </div>
-        <p class="col-md-8 fs-5 user-full-name fw-bold">{{ user_data.0.name }}</p>
-        <p class="col-md-8 fs-6 description">{{ user_data.0.user_desc }}</p>
+        <p class="col-md-8 fs-5 user-full-name fw-bold">{{ user_data.name }}</p>
+        <p class="col-md-8 fs-6 description">{{ user_data.user_desc }}</p>
       </div>
       <div class="col-md-2"></div>
       <div class="col-md-4 mr-2">
-        <img src="/media/{{ profile_pic }}" class="img-container" width="200px" height="200px" id="Profilephoto" style="object-fit: cover; border-radius: 50%;" alt="" />
+        <img src="/media/{{ searchedUserPic }}" class="img-container" width="200px" height="200px" id="Profilephoto" style="object-fit: cover; border-radius: 50%;" alt="" />
       </div>
     </div>
   </div>

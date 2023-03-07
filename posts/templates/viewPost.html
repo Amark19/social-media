@@ -35,11 +35,11 @@ background: #C0C0C0;
         <div class="col-md-5 border border-1 ">
             <div class="header">
                 <div class="d-flex text-muted pt-3">
-                    <img class="rounded-circle" width="32px" height="32px" src="/media/{{user_data.0.user_pic}}"
+                    <img class="rounded-circle" width="32px" height="32px" src="/media/{{user_data.user_pic}}"
                         style="object-fit: cover;" alt="">
                     <div class="pb-3 mb-2 mx-2 small lh-sm  w-100">
                         <div class="d-flex justify-content-between">
-                            <strong class="fs-6">{{request.user}}</strong>
+                            <strong class="fs-6">{{user_data.user_name}}</strong>
                             <a href="#">More</a>
                         </div>
                     </div>
@@ -49,11 +49,11 @@ background: #C0C0C0;
             <div class="body" style="max-height:400px;overflow-y: scroll;overflow-x:hidden;">
                 <div class="caption">
                     <div class="d-flex text-muted pt-3">
-                        <img class="rounded-circle" width="32px" height="32px" src="/media/{{user_data.0.user_pic}}"
+                        <img class="rounded-circle" width="32px" height="32px" src="/media/{{user_data.user_pic}}"
                             style="object-fit: cover;" alt="">
                         <div class="pb-3 mb-2 mx-2 small lh-sm  w-100">
                             <div class="d-flex justify-content-between">
-                                <strong class="fs-6">{{request.user}} <span>
+                                <strong class="fs-6">{{user_data.user_name}} <span>
                                         <p class="mt-2 fw-normal">{{post.content}}</p>
                                     </span></strong>
                             </div>
