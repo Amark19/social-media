@@ -14,13 +14,17 @@
     crossorigin="anonymous"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 </head>
-  <style>
-    a {
+<style>
+  a {
     color: ##58c4f2;
     text-decoration: none;
   }
-  {% block css %}{% endblock  %}
+
+    {% block css %}
+
+    {% endblock %}
 </style>
+
 <body>
   <form action="/post/createPost/" method="post" enctype="multipart/form-data">
     {% csrf_token %}
@@ -71,8 +75,7 @@
             <div id="content-form" style="display: none;">
               <div class="row justify-content-center">
                 <div id="preview-file-post">
-                  <div
-                    class="text-white bg-light rounded-3 d-flex justify-content-center align-items-center"
+                  <div class="text-white bg-light rounded-3 d-flex justify-content-center align-items-center"
                     style="height:100px">
                     <img src="" style="max-height: 100%;
                   max-width: 100%;
@@ -151,6 +154,8 @@
     </ul>
   </footer>
 </body>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+  integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
 <script>
   const input = document.getElementById('upload');
   const img = document.getElementById("media-image");
@@ -202,6 +207,10 @@
       document.getElementById('media-image-post').src = img.src;
     }
   }
+  var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+  var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+    return new bootstrap.Popover(popoverTriggerEl)
+  })
 </script>
 
 </html>
