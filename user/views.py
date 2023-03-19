@@ -22,6 +22,8 @@ def userObj(username):
 def login_user(request):
     global isregister
     login_valid = False
+    if request.user.is_authenticated:
+        return redirect('/')
     if request.method == "POST":
         username = request.POST["username"]
         passw = request.POST["password"]
@@ -38,6 +40,8 @@ def login_user(request):
 
 def register(request):
     global isregister
+    if request.user.is_authenticated:
+        return redirect('/')
     if request.method == "POST":
         username = request.POST["username"]
         request.session['username'] = username
@@ -54,7 +58,8 @@ def register(request):
         userData.objects.create(user_name=str(username), name=name, user_desc=bio,
                                 user_email=email, user_phone=str(phoneno), user_birthday=date, user_pic=pic)
         isregister = True
-        return redirect('login/')
+        login(request, authenticate(username=username, password=passw))
+        return redirect('/')
 
     else:
         isregister = False
