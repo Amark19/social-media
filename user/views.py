@@ -2,6 +2,7 @@
 from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from .models import userData
 from posts.models import Post
 from django.contrib.auth import authenticate, login, logout
@@ -10,6 +11,10 @@ from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
 from .utils import user_data
 from posts.utils import post_util
+from chats.models import Thread
+
+
+
 # Create your views here.
 islogout = False
 isregister = False
@@ -22,6 +27,8 @@ def userObj(username):
 def login_user(request):
     global isregister
     login_valid = False
+    if request.user.is_authenticated:
+        return redirect('/')
     if request.method == "POST":
         username = request.POST["username"]
         passw = request.POST["password"]
@@ -38,6 +45,8 @@ def login_user(request):
 
 def register(request):
     global isregister
+    if request.user.is_authenticated:
+        return redirect('/')
     if request.method == "POST":
         username = request.POST["username"]
         request.session['username'] = username
@@ -54,7 +63,8 @@ def register(request):
         userData.objects.create(user_name=str(username), name=name, user_desc=bio,
                                 user_email=email, user_phone=str(phoneno), user_birthday=date, user_pic=pic)
         isregister = True
-        return redirect('login/')
+        login(request, authenticate(username=username, password=passw))
+        return redirect('/')
 
     else:
         isregister = False
@@ -132,3 +142,9 @@ def changePassword(request):
         else:
             return render(request, 'usersettings/changepassword.html', {'profile_pic': userObj(request.user.username)['user_pic'], 'ispassValid': True})
     return render(request, 'usersettings/changepassword.html', {'profile_pic': userObj(request.user.username)['user_pic'], 'ispassValid': False})
+
+def chatTo(request,username):
+    user2 = get_user_model().objects.get(username=username)
+    print(userData.objects.get(user_name=request.user.username))
+    Thread.objects.create(user1=request.user,user2=user2,user1_profile_pic=userData.objects.get(user_name=request.user.username),user2_profile_pic=userData.objects.get(user_name=username))
+    return redirect('/chat/')
