@@ -5,6 +5,8 @@
         <h2 class="display-5">{{ user_data.user_name }}<span class="mx-3">
           {% if request.user.username == user_data.user_name %}
           <a class="btn btn-outline-secondary text-dark" href="/accounts/edit/">edit profile</a>
+          {% else %}
+          <a class="btn btn-outline-secondary text-dark" href="/chat-to/{{user_data.user_name}}">message</a>
           {% endif %}
         </span></h2>
         <div class="row my-4 mb-4">

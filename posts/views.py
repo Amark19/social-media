@@ -11,6 +11,7 @@ from user.utils import user_data
 
 
 def get_comments_data(all_comments):
+    all_comments = all_comments.order_by('-created_date').all()
     comments_data = []
     for i in range(len(all_comments)):
         comments_data.append({
@@ -20,8 +21,6 @@ def get_comments_data(all_comments):
             'user_pic': userData.objects.values('user_pic').filter(user_name=all_comments[i].user.username)[0]['user_pic'],
             'time_ago': time_diff.time_diff(datetime.now(timezone.utc), all_comments[i].created_date)
         })
-    # sorting comments by time_ago
-
     return comments_data
 
 
