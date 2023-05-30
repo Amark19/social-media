@@ -9,5 +9,7 @@ class userData(models.Model):
     user_phone = models.CharField(max_length=30)
     user_birthday = models.DateField()
     user_pic = models.ImageField(upload_to='images',blank=True)
+    # user_followers = models.ManyToManyField('self',related_name='followers',symmetrical=False,blank=True)
+    # user_following = models.ManyToManyField('self',related_name='following',symmetrical=False,blank=True)
     def __str__(self):
         return self.user_name
