@@ -11,3 +11,10 @@ class userData(models.Model):
     user_pic = models.ImageField(upload_to='images',blank=True)
     def __str__(self):
         return self.user_name
+    
+
+class userFollowers(models.Model):
+    following = models.ForeignKey(userData, on_delete=models.CASCADE,related_name="following",blank=True,default=1)
+    follower = models.ForeignKey(userData, on_delete=models.CASCADE,related_name='follower',blank=True)
+    def __str__(self):
+        return  self.following.user_name + " follows " + self.follower.user_name

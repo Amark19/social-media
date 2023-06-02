@@ -15,4 +15,5 @@ urlpatterns = [
     path('post/createPost/', post_views.create_post, name='createPost'),
     path('post/<int:post_id>/', post_views.view_post, name='viewPost'),
     path('chat-to/<str:username>/', views.chatTo, name='chatTo'),
+    path('<str:username>/follow/', views.Follow, name='Follow'),
 ]
