@@ -179,7 +179,6 @@ def Follow(request, username):
     else:
         return HttpResponse("404 not found")
 
-
 def SearchUser(request):
     username = request.GET.get('userName', '')
     # first check whether user have type more than 3 characters
