@@ -21,6 +21,7 @@ isregister = False
 
 def userObj(username):
     userObj = user_data.get_user_data(username)[0]
+    userObj['is_following'], userObj['is_followed'] = False, False
     return userObj
 
 
@@ -95,9 +96,8 @@ def profile(request, username):
     if not request.user.is_authenticated:
         return redirect('/login')
     elif username in User.objects.values_list('username', flat=True):
-        userQuery = userData.objects.get(user_name=username)
-        authUserQuery = userData.objects.get(user_name=request.user.username)
-        print(userQuery)
+        userQuery = user_data.getUserModelInstance(username)
+        authUserQuery = user_data.getUserModelInstance(request.user.username)
         post_data = post_util.get_post_data(username, include_likes=False)
         posts_length = len(post_data)
         if username == request.user.username:
@@ -163,7 +163,6 @@ def Follow(request, username):
     if request.method == "POST":
         username = request.POST['data[user]']
         if username in User.objects.values_list('username', flat=True):
-            print(userFollowers.objects.values_list())
             user1 = userData.objects.get(user_name=request.user.username)
             user2 = userData.objects.get(user_name=username)
             if user1.user_name != user2.user_name:
@@ -179,3 +178,42 @@ def Follow(request, username):
             return HttpResponse("404 not found")
     else:
         return HttpResponse("404 not found")
+
+
+def SearchUser(request):
+    username = request.GET.get('userName', '')
+    # first check whether user have type more than 3 characters
+    if len(username) > 3:
+        usersThreshold = 10
+        response = []
+        userAuthQuery = user_data.getUserModelInstance(request.user.username)
+
+        all_users = userData.objects.filter(
+            user_name__icontains=username).exclude(user_name=request.user.username)
+
+        for user in all_users:
+            tmpUserObj = userObj(user.user_name)
+            is_following = userFollowers.objects.filter(
+                following=userAuthQuery, follower=user).exists()
+            is_followed = userFollowers.objects.filter(
+                following=user, follower=userAuthQuery).exists()
+
+            if is_following or is_followed:
+                if is_following:
+                    tmpUserObj['is_following'] = True
+                if is_followed:
+                    tmpUserObj['is_followed'] = True
+                response.append(tmpUserObj)
+            elif tmpUserObj not in response:
+                response.append(tmpUserObj)
+
+        response = sorted(response, key=lambda user: (
+            user['is_following'], user['is_followed']), reverse=True)[:usersThreshold]
+
+        if len(response) == 0:
+            response = "NoUserFound"
+
+    else:
+        response = "LessChar"
+
+    return HttpResponse(response)

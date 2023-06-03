@@ -12,17 +12,23 @@ $input.on('keyup', function () {
 
 //on keydown, clear the countdown 
 $input.on('keydown', function () {
+    
+  console.log("loading..");
   clearTimeout(typingTimer);
 });
 
 //user is "finished typing," do something
-function doneTyping () {
-  //do something
-  console.log("loading..");
-  make_req("GET", `searchUserName/`, {
-    userName: $input.val(),
-  }, (result) => {
-    console.log("done");
-    console.log(result);
-  });
+function doneTyping() {
+    var currentURL = window.location.href;  // Get the current page URL
+    var searchURL = currentURL + '/searchUserName/';  // Construct the search URL
+    $.ajax({
+        type: "GET",
+        url: searchURL,
+        data: {
+            userName: $('#search').val(),
+        },
+        success: function (data) {
+            console.log(data);
+        }
+    });
 }
