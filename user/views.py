@@ -1,8 +1,10 @@
 
 from django.shortcuts import render, HttpResponse, redirect
+from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
+from django.db.models import Q
 from .models import userData, userFollowers
 from posts.models import Post
 from django.contrib.auth import authenticate, login, logout
@@ -182,38 +184,43 @@ def Follow(request, username):
 
 def SearchUser(request):
     username = request.GET.get('userName', '')
+    usernames = ' '.join(username.lower().split()).split(' ')
+    usersThreshold = 8
+    response = []
+    userAuthQuery = user_data.getUserModelInstance(request.user.username)
     # first check whether user have type more than 3 characters
     if len(username) > 3:
-        usersThreshold = 10
-        response = []
-        userAuthQuery = user_data.getUserModelInstance(request.user.username)
+        for username in usernames:
+            if len(username) > 3:
+                all_users = userData.objects.filter(
+                    Q(user_name__icontains=username) | Q(name__icontains=username)).exclude(user_name=request.user.username)
+                for user in all_users:
+                    tmpUserObj = userObj(user.user_name)
+                    if tmpUserObj in response:
+                        print("here ??")
+                        continue
+                    is_following = userFollowers.objects.filter(
+                        following=userAuthQuery, follower=user).exists()
+                    is_followed = userFollowers.objects.filter(
+                        following=user, follower=userAuthQuery).exists()
+                    if is_following or is_followed:
+                        if is_following:
+                            tmpUserObj['is_following'] = True
+                        if is_followed:
+                            tmpUserObj['is_followed'] = True
+                        if tmpUserObj in response:
+                            print("here ??")
+                            continue
+                        response.append(tmpUserObj)
+                    else:
+                        response.append(tmpUserObj)
 
-        all_users = userData.objects.filter(
-            user_name__icontains=username).exclude(user_name=request.user.username)
-
-        for user in all_users:
-            tmpUserObj = userObj(user.user_name)
-            is_following = userFollowers.objects.filter(
-                following=userAuthQuery, follower=user).exists()
-            is_followed = userFollowers.objects.filter(
-                following=user, follower=userAuthQuery).exists()
-
-            if is_following or is_followed:
-                if is_following:
-                    tmpUserObj['is_following'] = True
-                if is_followed:
-                    tmpUserObj['is_followed'] = True
-                response.append(tmpUserObj)
-            elif tmpUserObj not in response:
-                response.append(tmpUserObj)
-
-        response = sorted(response, key=lambda user: (
-            user['is_following'], user['is_followed']), reverse=True)[:usersThreshold]
+            response = sorted(response, key=lambda user: (
+                user['is_following'], user['is_followed']), reverse=True)[:usersThreshold]
 
         if len(response) == 0:
             response = "NoUserFound"
 
     else:
         response = "LessChar"
-
-    return HttpResponse(response)
+    return JsonResponse(response, safe=False)

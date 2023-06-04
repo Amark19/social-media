@@ -19,17 +19,38 @@
 </head>
 <style>
   a {
-    color: ##58c4f2;
+    color: #58c4f2;
     text-decoration: none;
   }
 
-    {
-    % block css %
+  .search-container {
+    position: relative;
   }
 
-    {
-    % endblock %
+  .search-results {
+    position: absolute;
+    top: 100%;
+    left:10px;
+    z-index: 999;
+    width: 100%;
+    border: 2px solid rgb(219, 219, 219);
+    padding: 8px;
+    background-color: #f7f7f7;
+    border-radius: 10px;
   }
+
+  .body-content {
+    /* Add styles for the body content */
+  }
+  .results:hover{
+    background-color: rgb(180, 212, 238);
+    cursor: pointer;
+  }
+
+
+    {% block css %}
+
+    {% endblock %}
 </style>
 
 <body>
@@ -114,14 +135,16 @@
   </form>
   <div class="container">
     <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
-      <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
+      <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-5 text-dark text-decoration-none">
         <img class="bi pt-2" src="/static/logo-1.png" width="50" height="50">
         <span class="fs-4 mx-2">Social App</span>
       </a>
-      <div class="col-4 col-lg-5 mr-0 my-1 me-lg-3">
-        <input type="search" class="form-control" placeholder="Search..." aria-label="Search" id="search">
+      <div class="col-4 col-lg-5 mr-0 my-1 me-lg-3 search-container">
+        <input type="search" class="form-control" style="border-radius:10px;" placeholder="Search..." aria-label="Search" id="search">
+        <div class="row flex-column search-results my-2 p-3 "  style="display: none;">
+         Loading...
+        </div>
       </div>
-
       <ul class="nav nav-pills">
         <li class="nav-item"><a href="/" class="nav-link" aria-current="page"><img src="/static/home.svg" width="25px"
               height="25px" alt=""></a></li>
@@ -135,7 +158,12 @@
         <div class="flex-shrink-0 dropdown mx-5">
           <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" id="dropdownUser2"
             data-bs-toggle="dropdown" aria-expanded="false">
-            <img src="/media/{{profile_pic}}" alt="mdo" width="32" height="32" class="img-container rounded-circle">
+            <img src=
+            {% if profile_pic %}
+            "/media/{{profile_pic}}"
+            {% endif %}
+            "/static/avatar.png"
+            alt="mdo" width="32" height="32" class="img-container rounded-circle">
           </a>
           <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser2">
             <li><a class="dropdown-item" href="/{{request.user}}/">Profile</a></li>
@@ -149,6 +177,8 @@
         </div>
       </div>
     </header>
+
+  </div>
   </div>
   {% block body %}{% endblock %}
 

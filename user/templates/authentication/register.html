@@ -86,10 +86,6 @@
             <label for="floatingPassword">Confirm Password</label>
             <small id="confpasshelp" style="display: none;" class="form-text text-muted">Password do not match!</small>
           </div>
-
-          <div class="checkbox mb-3">
-            <label><input type="checkbox" value="remember-me" />Remember me</label>
-          </div>
           <div class="d-block col-md-6">
             <button class="btn col-md-6 btn-primary" id="register" disabled>Next</button>
           </div>
@@ -146,7 +142,13 @@
     function checkForUsernme(){
       var username = document.getElementById("username").value;
       const isusernameInclude = usernames[0].includes(username);
-      if(!isusernameInclude){
+      if(username.length < 4){
+        document.getElementById("usernamehelp").innerHTML = "username should be more than 3 characters";
+        document.getElementById("usernamehelp").style.display = "block";
+        document.getElementById('register').disabled = true;
+        isusernm=0;
+      }
+      else if(!isusernameInclude){
         document.getElementById("usernamehelp").style.display = "none";
         isusernm=1;
         allvalidate();
