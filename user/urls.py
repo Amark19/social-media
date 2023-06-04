@@ -1,6 +1,6 @@
 
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include,re_path
 from . import views
 from posts import views as post_views
 
@@ -16,4 +16,5 @@ urlpatterns = [
     path('post/<int:post_id>/', post_views.view_post, name='viewPost'),
     path('chat-to/<str:username>/', views.chatTo, name='chatTo'),
     path('<str:username>/follow/', views.Follow, name='Follow'),
+    re_path(r'^.*?searchUserName/$', views.SearchUser, name='SearchUser'),
 ]
