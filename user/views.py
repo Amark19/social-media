@@ -181,7 +181,6 @@ def Follow(request, username):
     else:
         return HttpResponse("404 not found")
 
-
 def SearchUser(request):
     username = request.GET.get('userName', '')
     usernames = ' '.join(username.lower().split()).split(' ')
