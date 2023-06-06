@@ -1,0 +1,46 @@
+{% extends 'baseTemplate.html' %}
+{% block css %}
+
+{% endblock  %}
+{% block body %}
+
+  <div class="container col-md-6">
+    {% for post in feed_results %}
+    <div class="card  border-0 shadow rounded my-4" style="background-color: white;">
+      <div class="card-header border-0">
+        <div class="d-flex align-items-center p-1">
+          <img src="/media/{{post.user_pic}}" class="rounded-circle mr-2 border-2" alt="User Photo" width="40" height="40" />
+          <div class="mx-3">
+            <h6 class="mb-0">{{post.user_name}}</h6> <!-- User's Username -->
+            <span class="text-muted">{{post.name}}</span> <!-- User's Actual Name -->
+          </div>
+          <div class="time mx-2 mb-auto">
+            <small>13m</small><!-- Time of Post -->
+          </div>
+        </div>
+      </div>
+      <div class="card-body" 
+      >
+        <div class="text-white rounded-3 d-flex justify-content-center align-items-center " style="height:400px;">
+          <img src="/media/{{post.media}}" class="" alt="loading-post" style="max-height: 100%;
+            max-width: 100%;
+            background-repeat: no-repeat;
+            background-position: center;" />
+        </div>
+      </div>
+      <div class="card-footer border-0">
+        <div class="d-flex justify-content-around">
+          <div class="likes">
+            <i class="far fa-thumbs-up"></i> <!-- Likes Icon -->
+            <span class="ml-1">{{post.likes}}</span> <!-- Number of Likes -->
+          </div>
+          <div class="comments">
+            <i class="far fa-comments"></i> <!-- Comments Icon -->
+            <span class="ml-1">{{post.comments}} Comments</span> <!-- Number of Comments -->
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+{% endblock %}

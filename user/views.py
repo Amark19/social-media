@@ -5,26 +5,32 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 from django.db.models import Q
-from .models import userData, userFollowers
-from posts.models import Post
-from django.contrib.auth import authenticate, login, logout
-import json
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
-from .utils import user_data
-from posts.utils import post_util
+from django.contrib.auth import authenticate, login, logout
+from .models import userData, userFollowers
 from chats.models import Thread
+from posts.models import Post, Comment
+from .utils import user_data, feed_utils
+from posts.utils import post_util
+import json
 
 
 # Create your views here.
 islogout = False
 isregister = False
 
+feed_results = []
+
 
 def userObj(username):
     userObj = user_data.get_user_data(username)[0]
     userObj['is_following'], userObj['is_followed'] = False, False
     return userObj
+
+
+def post_by_pages(request, page_no):
+    pass
 
 
 def login_user(request):
@@ -86,11 +92,55 @@ def logout_user(request):
 
 @login_required(login_url='login')
 def home(request):
-    if not request.user.is_authenticated:
-        return redirect('/login')
-    elif request.user.is_authenticated:
-        username = request.user.username
-        return render(request, 'baseTemplate.html', {'user_data': userObj(username), 'profile_pic': userObj(username)['user_pic']})
+    '''
+    Designing the home page by fetching first 10 posts per page
+
+    Parameters: (they are listed as in order of their importancee)
+
+    Following :-
+    - check auth users following
+    - fetch the posts of those folowing users who posted a post within a threshold days
+      - if there n posts then show post with good likes & comments. Good post can be evaluated by formula likes + comments
+    - if post do not exists then go to follower
+
+    Follower :- 
+    - same as following
+
+    other :- 
+    - show the post again within threshold days which has good likes & comments independent of following or follower
+
+    '''
+    feed_results = set()
+    username = request.user.username
+    following_users = userFollowers.objects.filter(
+        following=user_data.getUserModelInstance(username))
+    followers_users = userFollowers.objects.filter(
+        follower=user_data.getUserModelInstance(username))
+    #following
+    feed_utils.get_feed_posts(following_users, feed_results , 'following')
+    #followers
+    feed_utils.get_feed_posts(followers_users, feed_results , 'followers')
+
+    # Fetch posts from other users with good likes and comments
+    other_users = User.objects.exclude(username__in=following_users.values_list('follower__user_name', flat=True)).exclude(
+        username__in=followers_users.values_list('following__user_name', flat=True))
+    feed_utils.get_feed_posts(other_users, feed_results, 'other')
+
+    feed_response = []
+    for post in feed_results:
+        post_userInstace = user_data.getUserModelInstance(post.username)
+        
+        feed_response.append({
+                'media' : post.media,
+                'caption' : post.content,
+                'likes' : post.likes.count(),
+                'comments' : Comment.objects.filter(post=post).count(),
+                'user_name' : post.username,
+                'name' : post_userInstace.name,
+                'user_pic' : post_userInstace.user_pic,
+        })
+
+    return render(request, 'feed/posts.html', {'user_data': userObj(username), 'profile_pic': userObj(username)['user_pic'],'feed_results': feed_response[:min(len(feed_response),10)]})
 
 
 @login_required(login_url='login')
@@ -180,6 +230,7 @@ def Follow(request, username):
             return HttpResponse("404 not found")
     else:
         return HttpResponse("404 not found")
+
 
 def SearchUser(request):
     username = request.GET.get('userName', '')

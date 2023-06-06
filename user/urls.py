@@ -17,4 +17,5 @@ urlpatterns = [
     path('chat-to/<str:username>/', views.chatTo, name='chatTo'),
     path('<str:username>/follow/', views.Follow, name='Follow'),
     re_path(r'^.*?searchUserName/$', views.SearchUser, name='SearchUser'),
+    path('feed-posts/<int:post_id>/', views.post_by_pages, name='viewPost'),
 ]
