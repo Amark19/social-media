@@ -40,7 +40,7 @@ def post_by_pages(request):
         page = request.GET.get('page')
         print(len(feed_results))
         feed_response = feed_utils.manage_feed(
-            feed_results[int(page)-1:min(len(feed_results),int(page) + threshold_per_page)])
+            feed_results[int(page)-1:min(len(feed_results), int(page) + threshold_per_page)])
         return JsonResponse(feed_response, safe=False)
     return HttpResponse('method not found')
 
