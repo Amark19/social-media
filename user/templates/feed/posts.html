@@ -1,0 +1,165 @@
+{% extends 'baseTemplate.html' %}
+{% block css %}
+
+{% endblock %}
+{% block body %}
+  <div class="container col-md-6" id="feed-results">
+    {% for post in feed_results %}
+      <div class="card border-0 shadow rounded my-4 post " id="post-{{forloop.counter}}" style="background-color: white;">
+        <div class="card-header border-0">
+          <div class="d-flex align-items-center p-1">
+            <img src="{{ post.user_pic }}" class="rounded-circle mr-2 border-2" alt="User Photo" width="40" height="40" />
+            <div class="mx-3">
+              <h6 class="mb-0" style="cursor:pointer;" onclick="location.href='/{{ post.user_name }}/';">{{ post.user_name }}</h6> <!-- User's Username -->
+              <span class="text-muted">{{ post.name }}</span> <!-- User's Actual Name -->
+            </div>
+            <div class="time mx-2 mb-auto">
+              <small>{{post.post_time}}</small><!-- Time of Post -->
+            </div>
+          </div>
+        </div>
+        <div class="body-footer" style="cursor: pointer;" onclick="location.href='/post/{{post.post_id}}/';">
+          <div class="body">
+            <div class="text-white rounded-3 d-flex justify-content-center align-items-center" style="height:400px;">
+              <img src="{{ post.media }}" class="" alt="loading-post" style="max-height: 100%;
+            max-width: 100%;
+            background-repeat: no-repeat;
+            background-position: center;" />
+            </div>
+          </div>
+          <div class="card-footer border-0">
+            <div class="d-flex justify-content-between">
+              <div class="likes">
+                <i class="fa fa-solid fa-thumbs-up"></i> <!-- Likes Icon -->
+                <span class="ml-1">
+                  <strong>{{ post.likes }}</strong> {% if post.likes != 1 %}
+                    likes
+                  {% else %}
+                    like
+                  {% endif %}
+                </span> <!-- Number of Likes -->
+              </div>
+              <div class="comments">
+                <i class="fa fa-solid fa-comments"></i> <!-- Comments Icon -->
+                <span class="ml-1">
+                  <strong>{{ post.comments }}</strong> {% if post.comments != 1 %}
+                    comments
+                  {% else %}
+                    comment
+                  {% endif %}
+                </span> <!-- Number of Comments -->
+              </div>
+            </div>
+            <div class="caption mt-3">
+              <p class="mb-0">
+                <strong>{{ post.user_name }}</strong> {{ post.caption }}
+              </p> <!-- Caption -->
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+  <div class="loading mx-auto" style="display: none;position: absolute;left: 50%;">
+    <div class="spinner-border text-primary" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
+  </div>
+  <div id="end" class=" container text-center my-2" style="display: none;">
+    <p class="lead">Sorry,we do not have more than this to show due to less data :(</p>
+  </div>
+  <script src="/static/utils/ajax_req.js"></script>
+  <script>
+    var is_end = 0;
+     function load_next_posts (page){
+      $.ajax({
+        type: 'GET',
+        url: '{% url "post_by_pages" %}',
+        data: {
+          'page': page,
+        },
+        success: function(response) {
+          $('.loading').hide();
+          if (response.length == 0) {
+            $('#end').show();
+            
+        $('.loading').hide();
+            is_end = 1;
+          }
+          else{
+            response.map((post,index) => {
+              $('#feed-results').append(
+                `<div class="card border-0 shadow rounded my-4 post " id="post-${index + page}" style="background-color: white;">
+                  <div class="card-header border-0">
+                    <div class="d-flex align-items-center p-1">
+                      <img src='${ post.user_pic }' class="rounded-circle mr-2 border-2" alt="User Photo" width="40" height="40" />
+                      <div class="mx-3">
+                        <h6 class="mb-0" style="cursor:pointer;" onclick="location.href='/${ post.user_name }/';">${ post.user_name }</h6> 
+                        <span class="text-muted">${ post.name }</span>
+                      </div>
+                      <div class="time mx-2 mb-auto">
+                        <small>${post.post_time}</small><!-- Time of Post -->
+                      </div>
+                    </div>
+                  </div>
+                  <div class="body-footer" style="cursor: pointer;" onclick="location.href='/post/${post.post_id}/';">
+                    <div class="body">
+                      <div class="text-white rounded-3 d-flex justify-content-center align-items-center" style="height:400px;">
+                        <img src="${ post.media }" class="" alt="loading-post" style="max-height: 100%;
+                      max-width: 100%;
+                      background-repeat: no-repeat;
+                      background-position: center;" />
+                      </div>
+                    </div>
+                    <div class="card-footer border-0">
+                      <div class="d-flex justify-content-between">
+                        <div class="likes">
+                          <i class="fa fa-solid fa-thumbs-up"></i> <!-- Likes Icon -->
+                          <span class="ml-1">
+                            <strong>${ post.likes }</strong>
+                            ${ post.likes > 1 ? 'likes' : 'like'}
+                          </span>
+                        </div>
+                        <div class="comments">
+                          <i class="fa fa-solid fa-comments"></i> <!-- Comments Icon -->
+                          <span class="ml-1">
+                            <strong>${ post.comments }</strong> 
+                            ${ post.comments > 1 ? 'comments' : 'comment'}
+                          </span>
+                        </div>
+                      </div>
+                      <div class="caption mt-3">
+                        <p class="mb-0">
+                          <strong>${ post.user_name }</strong> ${ post.caption }
+                        </p> <!-- Caption -->
+                      </div>
+                    </div>
+                  </div>
+                </div>`
+              )
+            })
+          }
+        },
+        error: function(xhr, status, error) {
+          // Handle any errors that occur during the request
+        }
+      });
+      
+    } 
+    $(window).scroll(function() {
+      if ($(window).scrollTop() + $(window).height() >= $(document).height()) {
+        var last_post = $('.post').last().attr('id');
+        var nextPage = parseInt(last_post.split('-')[1]) + 1;
+        if (is_end == 1) {
+          return;
+        }
+        console.log("called",nextPage);
+        $('.loading').show();
+        load_next_posts(nextPage);
+      }
+    });
+    window.onload = function() {
+      window.scrollTo(0, 0);
+    };
+  </script>
+{% endblock %}
