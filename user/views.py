@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 from django.contrib import messages
+from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate, login, logout
 from .models import userData, userFollowers
@@ -21,6 +22,7 @@ islogout = False
 isregister = False
 
 feed_results = []
+threshold_per_page = 3
 
 
 def userObj(username):
@@ -29,8 +31,14 @@ def userObj(username):
     return userObj
 
 
-def post_by_pages(request, page_no):
-    pass
+def post_by_pages(request):
+    if request.method == "GET":
+        page = request.GET.get('page')
+        print(len(feed_results))
+        feed_response = feed_utils.manage_feed(
+            feed_results[int(page)-1:min(len(feed_results),int(page) + threshold_per_page)])
+        return JsonResponse(feed_response, safe=False)
+    return HttpResponse('method not found')
 
 
 def login_user(request):
@@ -110,37 +118,28 @@ def home(request):
     - show the post again within threshold days which has good likes & comments independent of following or follower
 
     '''
-    feed_results = set()
+    feed_results.clear()
     username = request.user.username
     following_users = userFollowers.objects.filter(
         following=user_data.getUserModelInstance(username))
     followers_users = userFollowers.objects.filter(
         follower=user_data.getUserModelInstance(username))
-    #following
-    feed_utils.get_feed_posts(following_users, feed_results , 'following')
-    #followers
-    feed_utils.get_feed_posts(followers_users, feed_results , 'followers')
+    # following
+    feed_utils.get_feed_posts(following_users, feed_results, 'following')
+    # followers
+    excluded_frm_following = followers_users.exclude(
+        following__user_name__in=following_users.values_list('follower__user_name', flat=True))
+    feed_utils.get_feed_posts(excluded_frm_following,
+                              feed_results, 'followers')
 
     # Fetch posts from other users with good likes and comments
     other_users = User.objects.exclude(username__in=following_users.values_list('follower__user_name', flat=True)).exclude(
         username__in=followers_users.values_list('following__user_name', flat=True))
     feed_utils.get_feed_posts(other_users, feed_results, 'other')
+    feed_response = feed_utils.manage_feed(
+        feed_results[:min(len(feed_results), threshold_per_page)])
 
-    feed_response = []
-    for post in feed_results:
-        post_userInstace = user_data.getUserModelInstance(post.username)
-        
-        feed_response.append({
-                'media' : post.media,
-                'caption' : post.content,
-                'likes' : post.likes.count(),
-                'comments' : Comment.objects.filter(post=post).count(),
-                'user_name' : post.username,
-                'name' : post_userInstace.name,
-                'user_pic' : post_userInstace.user_pic,
-        })
-
-    return render(request, 'feed/posts.html', {'user_data': userObj(username), 'profile_pic': userObj(username)['user_pic'],'feed_results': feed_response[:min(len(feed_response),10)]})
+    return render(request, 'feed/posts.html', {'user_data': userObj(username), 'profile_pic': userObj(username)['user_pic'], 'feed_results': feed_response})
 
 
 @login_required(login_url='login')

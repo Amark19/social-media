@@ -16,6 +16,6 @@ urlpatterns = [
     path('post/<int:post_id>/', post_views.view_post, name='viewPost'),
     path('chat-to/<str:username>/', views.chatTo, name='chatTo'),
     path('<str:username>/follow/', views.Follow, name='Follow'),
+    path('/feed-posts/', views.post_by_pages, name='post_by_pages'),
     re_path(r'^.*?searchUserName/$', views.SearchUser, name='SearchUser'),
-    path('feed-posts/<int:post_id>/', views.post_by_pages, name='viewPost'),
 ]
