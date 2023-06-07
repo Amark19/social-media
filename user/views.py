@@ -5,6 +5,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 from django.db.models import Q
+from .models import userData, userFollowers
+from posts.models import Post
+from django.contrib.auth import authenticate, login, logout
+import json
 from django.contrib import messages
 from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
