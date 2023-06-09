@@ -7,7 +7,7 @@ edit profile
 {% block main-section %}
 {% if isupdate %}
 <div class="alert alert-warning alert-dismissible fade mt-5 show" role="alert">
-  Hey <strong> {{request.user}}, </strong> Your details update successfully.
+  Hey <strong> {{ request.user }}, </strong> Your details update successfully.
   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
 {% endif %}
@@ -20,8 +20,8 @@ edit profile
     </div>
     <div class="col-md-4 my-3">
       <h3>{{request.user}}</h3>
-      <input type="file" id="upload" accept="image/png,image/jpg,image/jpeg" name="pic" onchange="imageUpload()"
-        hidden />
+      <input type="file" id="upload" accept="image/png,image/jpg,image/jpeg" name="pic" 
+         hidden/>
       <label for="upload" class="text-center  btn btn-outline-primary mb-2">change profile pic</label>
       <small class="text-muted text-center" id="pic_name"></small>
       <a class="text-center mx-4 my-2" type="" name="removeP" href="">Remove photo</a>
@@ -54,36 +54,36 @@ edit profile
 </form>
 {% endblock %}
 {% block JS %}
-$(".nav .nav-link").on("click", function(){
-$(".nav").find(".active").removeClass("active");
-$(this).addClass("active");
+$(".nav .nav-link").on("click", function () {
+  $(".nav").find(".active").removeClass("active");
+  $(this).addClass("active");
 });
 
-function closeModal(e){
-$('#exampleModal').modal('hide');
-e.preventDefault();
+function closeModal(e) {
+  $('#exampleModal').modal('hide');
+  e.preventDefault();
 }
 
-function imageUpload(){
-console.log("done")
-var file = document.getElementById('upload');
-
-if(file.value!=""){
-var data = new FormData();
-data.append('image', file.files[0]);
-$.ajax({
-type: 'POST',
-url: '/accounts/edit/',
-data:data,
-cache: false,
-contentType: false,
-processData: false,
-encode:true,
-success: function (response) {
-window.location.reload();
-},
+$("#upload").change(function (e) {
+  var file = e.target.files[0];
+  console.log(file)
+  if (file.value != "") {
+    var data = new FormData();
+    data.append('image', file);
+    console.log("done")
+    $.ajax({
+      type: 'POST',
+      url: '/accounts/edit/',
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      encode: true,
+      success: function (response) {
+        window.location.reload();
+      },
+    });
+  }
 });
-}
 
-}
-{% endblock %}
+{% endblock  %}

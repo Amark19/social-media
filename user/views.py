@@ -175,10 +175,8 @@ def edit_profile(request):
             from PIL import Image
             pic = request.FILES['image']
             Image.open(pic).save('media/' + pic.name)
-            userData.objects.filter(
-                user_name=request.user.username)
-            userData.user_pic = pic
-            userData.save()
+            userData.objects.filter(user_name=request.user.username).update(
+                user_pic=pic)
         elif 'name' in request.POST:
             name = request.POST['name']
             bio = request.POST['bio']
