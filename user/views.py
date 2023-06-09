@@ -37,7 +37,6 @@ def userObj(username):
 def post_by_pages(request):
     if request.method == "GET":
         page = request.GET.get('page')
-        print(len(feed_results))
         feed_response = feed_utils.manage_feed(
             feed_results[int(page)-1:min(len(feed_results), int(page) + threshold_per_page)])
         return JsonResponse(feed_response, safe=False)
@@ -155,7 +154,6 @@ def profile(request, username):
         post_data = feed_utils.manage_feed(Post.objects.filter(
             username=username).order_by('-date_posted'))
         posts_length = len(post_data)
-        print(posts_length)
         if username == request.user.username:
             profile_pic = userObj(username)['user_pic']
         else:
@@ -177,7 +175,7 @@ def edit_profile(request):
             pic = request.FILES['image']
             Image.open(pic).save('media/' + pic.name)
             userData.objects.filter(user_name=request.user.username).update(
-                user_pic=pic,name=name, user_desc=bio, user_email=email, user_phone=phoneN)
+                user_pic=pic, name=name, user_desc=bio, user_email=email, user_phone=phoneN)
         elif 'name' in request.POST:
             name = request.POST['name']
             bio = request.POST['bio']
@@ -186,8 +184,7 @@ def edit_profile(request):
             userData.objects.filter(user_name=request.user.username).update(
                 name=name, user_desc=bio, user_email=email, user_phone=phoneN)
         return render(request, 'usersettings/editProfile.html', {'user_data': userObj(request.user.username), 'profile_pic':  userObj(request.user.username)['user_pic'], 'isupdate': True})
-    
-    print(userObj(request.user.username))
+
     return render(request, 'usersettings/editProfile.html', {'user_data':  userObj(request.user.username), 'profile_pic':  userObj(request.user.username)['user_pic'], 'isupdate': False})
 
 
@@ -208,9 +205,9 @@ def changePassword(request):
 
 def chatTo(request, username):
     user2 = get_user_model().objects.get(username=username)
-    print(userData.objects.get(user_name=request.user.username))
-    Thread.objects.create(user1=request.user, user2=user2, user1_profile_pic=userData.objects.get(
-        user_name=request.user.username), user2_profile_pic=userData.objects.get(user_name=username))
+    if not Thread.objects.filter(Q(user1=request.user, user2=user2) | Q(user1=user2, user2=request.user)).exists():
+        Thread.objects.create(user1=request.user, user2=user2, user1_profile_pic=userData.objects.get(
+            user_name=request.user.username), user2_profile_pic=userData.objects.get(user_name=username))
     return redirect('/chat/')
 
 
@@ -251,7 +248,6 @@ def SearchUser(request):
                 for user in all_users:
                     tmpUserObj = userObj(user.user_name)
                     if tmpUserObj in response:
-                        print("here ??")
                         continue
                     is_following = userFollowers.objects.filter(
                         following=userAuthQuery, follower=user).exists()
@@ -263,7 +259,6 @@ def SearchUser(request):
                         if is_followed:
                             tmpUserObj['is_followed'] = True
                         if tmpUserObj in response:
-                            print("here ??")
                             continue
                         response.append(tmpUserObj)
                     else:
