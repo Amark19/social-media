@@ -6,8 +6,8 @@ edit profile
 {% endblock %}
 {% block main-section %}
 {% if isupdate %}
-<div class="alert alert-warning alert-dismissible fade mt-5 show" role="alert">
-  Hey <strong> {{ request.user }}, </strong> Your details update successfully.
+<div class="alert alert-warning alert-dismissible fade  show" role="alert">
+  Hey <strong> {{ request.user }}, </strong> Your details updated successfully.
   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
 {% endif %}
@@ -31,23 +31,23 @@ edit profile
 <form action="/accounts/edit/" method="post">
   <div class="my-5">
     <label for="exampleFormControlInput1" class="form-label">Name:</label>
-    <input type="text" class="form-control" name="name" id="exampleFormControlInput1" value="{{user_data.0.name}}"
+    <input type="text" class="form-control" name="name" id="exampleFormControlInput1" value="{{user_data.name}}"
       placeholder="Enter name">
   </div>
   <div class="mb-3">
     <label for="exampleFormControlTextarea1" class="form-label">Bio:</label>
     <textarea class="form-control" name="bio" id="exampleFormControlTextarea1"
-      rows="3">{{user_data.0.user_desc}}</textarea>
+      rows="3">{{user_data.user_desc}}</textarea>
   </div>
   <div class="mb-3">
     <label for="exampleFormControlInput1" class="form-label">Email Address:</label>
     <input type="email" class="form-control" name="email" id="exampleFormControlInput1"
-      value="{{user_data.0.user_email}}" placeholder="Email Address">
+      value="{{user_data.user_email}}" placeholder="Email Address">
   </div>
   <div class="mb-3">
     <label for="exampleFormControlInput1" class="form-label">Phone number:</label>
     <input type="number" class="form-control" name="phoneN" id="exampleFormControlInput1"
-      value="{{user_data.0.user_phone}}" placeholder="Email Address">
+      value="{{user_data.user_phone}}" placeholder="Phone Number">
   </div>
   <button class="btn btn-primary" type="submit">update</button>
 

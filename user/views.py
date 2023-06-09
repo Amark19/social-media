@@ -17,7 +17,6 @@ from .models import userData, userFollowers
 from chats.models import Thread
 from posts.models import Post, Comment
 from .utils import user_data, feed_utils
-from posts.utils import post_util
 import json
 
 
@@ -153,8 +152,10 @@ def profile(request, username):
     elif username in User.objects.values_list('username', flat=True):
         userQuery = user_data.getUserModelInstance(username)
         authUserQuery = user_data.getUserModelInstance(request.user.username)
-        post_data = post_util.get_post_data(username, include_likes=False)
+        post_data = feed_utils.manage_feed(Post.objects.filter(
+            username=username).order_by('-date_posted'))
         posts_length = len(post_data)
+        print(posts_length)
         if username == request.user.username:
             profile_pic = userObj(username)['user_pic']
         else:
@@ -176,7 +177,7 @@ def edit_profile(request):
             pic = request.FILES['image']
             Image.open(pic).save('media/' + pic.name)
             userData.objects.filter(user_name=request.user.username).update(
-                user_pic=pic)
+                user_pic=pic,name=name, user_desc=bio, user_email=email, user_phone=phoneN)
         elif 'name' in request.POST:
             name = request.POST['name']
             bio = request.POST['bio']
@@ -185,6 +186,8 @@ def edit_profile(request):
             userData.objects.filter(user_name=request.user.username).update(
                 name=name, user_desc=bio, user_email=email, user_phone=phoneN)
         return render(request, 'usersettings/editProfile.html', {'user_data': userObj(request.user.username), 'profile_pic':  userObj(request.user.username)['user_pic'], 'isupdate': True})
+    
+    print(userObj(request.user.username))
     return render(request, 'usersettings/editProfile.html', {'user_data':  userObj(request.user.username), 'profile_pic':  userObj(request.user.username)['user_pic'], 'isupdate': False})
 
 
