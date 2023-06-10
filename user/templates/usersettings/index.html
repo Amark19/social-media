@@ -1,50 +1,45 @@
 {% extends 'baseTemplate.html' %}
-<title>{% block title %}{% endblock %}</title>
+<title>
+  {% block title %}
+  {% endblock %}
+</title>
 {% block css %}
 
 {% endblock %}
 {% block body %}
-<h1 class="visually-hidden">Sidebars examples</h1>
-<div class="container">
-    <div class="row">
-        <div class="col-md-4">
-            <div class="d-flex flex-column flex-shrink-0 p-3 text-white bg-light " style="width: 280px;">
-                <hr>
-                <ul class="nav nav-pills flex-column mb-auto">
-                    <li class="nav-item">
-                        <a href="/accounts/edit/" id="edit" class="nav-link active text-dark" >
-                            Edit Profile
-                        </a>
-                    </li>
-                    <li class="my-2 nav-item" id="changepass">
-                        <a href="/accounts/changePassword/" class="nav-link text-dark">
-                            Change Password
-                        </a>
-                    </li>
-                    <li class="my-2">
-                        <a href="#" class="nav-link text-dark">
-                            Apps & Websites
-                        </a>
-                    </li>
-                    <li class="my-2">
-                        <a href="#" class="nav-link text-dark">
-                            Privacy and Security
-                        </a>
-                    </li>
-
-                </ul>
-                <hr>
-
-            </div>
+  <h1 class="visually-hidden">Sidebars examples</h1>
+  <div class="container col-md-8">
+    <div class="d-flex flex-column flex-shrink-0 p-3 mb-4 text-white bg-light shadow rounded">
+      <ul class="nav nav-tabs">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="/accounts/edit/">Edit Profile</a>
+        </li>
+        <li class="nav-item" id="changepass">
+          <a class="nav-link" href="/accounts/changePassword/" >Chage Password</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Apps & Websites</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="#"  >Privacy and Security</a>
+        </li>
+      </ul>
+      <hr />
+      <div class="main-section">
+        <div class="p-5 bg-light rounded-3">
+          {% block main-section %}
+          {% endblock %}
         </div>
-        <div class="col-md-7">
-            <div class="p-5 mb-4 bg-light rounded-3">
-                {% block main-section %}{% endblock %}
-            </div>
-        </div>
+      </div>
     </div>
-</div>
-<script>
+  </div>
+  
+  <script>
+    $('.nav-link').click(function() {
+        $('.nav-link').removeClass('active');
+        $(this).addClass('active');
+        console.log('clicked')
+      });
     {% block JS %}
     {% endblock %}
 </script>

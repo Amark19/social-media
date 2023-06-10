@@ -175,7 +175,7 @@ def edit_profile(request):
             pic = request.FILES['image']
             Image.open(pic).save('media/' + pic.name)
             userData.objects.filter(user_name=request.user.username).update(
-                user_pic=pic, name=name, user_desc=bio, user_email=email, user_phone=phoneN)
+                user_pic=pic)
         elif 'name' in request.POST:
             name = request.POST['name']
             bio = request.POST['bio']
