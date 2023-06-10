@@ -12,7 +12,10 @@ if (loc.protocol == 'https:') {
 
 let endpoint = wsStart + loc.host + loc.pathname;
 
+console.log("something ","socket");
 const socket = new WebSocket(endpoint);
+
+console.log("something",socket);
 
 socket.onopen = async function (e) { //called when socket connection is opened,so js inside of it can run line by line as normal js till connection is open
     console.log("Socket opened");

@@ -10,7 +10,7 @@ def home(request):
     threads = Thread.objects.by_user(user=request.user).prefetch_related('chatmessage_thread').order_by('-timestamp')
     context = {
         'Threads':threads,
-
+        'profile_pic':user_data.get_user_data(request.user.username)[0]['user_pic']
     }
 
     return render(request,'home.html',context)

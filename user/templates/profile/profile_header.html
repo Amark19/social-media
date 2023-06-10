@@ -47,18 +47,22 @@
       width: 100%;
       text-align: center;
     }
+    .right{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
   }
   
 </style>
 
 <div class="mb-4 ">
-  <div class="container-fluid ">
+  <div class="container-fluid">
     <div class="row profile-header">
       <div class="col-md-4 mr-2">
         <img src="/media/{{ searchedUserPic }}" class="img-container" width="200px" height="200px" id="Profilephoto" style="object-fit: cover; border-radius: 50%;" alt="" />
       </div>
-      
-      <div class="col-md-8 col-sm-12">
+      <div class="col-md-8 col-sm-12 right">
         <div id="username-header" style="display: none;">{{ user_data.user_name }}</div>
         <h2 class="username">
           {{ user_data.user_name }}
@@ -77,16 +81,10 @@
             {% endif %}
           </span>
         </h2>
-        <div class="row my-3">
-          <div class="col">
+        <div class="d-flex  flex-row  my-3">
             <p class="fw-bold" id="posts">{{post_length}} posts</p>
-          </div>
-          <div class="col">
-            <p class="fw-bold" id="followers">{{followers.0.count}} Followers</p>
-          </div>
-          <div class="col">
-            <p class="fw-bold" id="following">{{followers.1.count}} Following</p>
-          </div>
+            <p class="fw-bold ms-4" id="followers">{{followers.0.count}} Followers</p>
+            <p class="fw-bold ms-4" id="following">{{followers.1.count}} Following</p>
         </div>
         <p class="col-md-8 fs-5 user-full-name fw-bold">{{ user_data.name }}</p>
         <p class="col-md-8 fs-6 description">{{ user_data.user_desc }}</p>
