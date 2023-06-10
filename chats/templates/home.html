@@ -57,7 +57,7 @@
                     {% else %}
                     <span>Chat with {{ thread.user1.username }}</span>
                     {% endif %}
-                    <p>{{ thread.chatmessage_thread.all.count }} messages</p>
+                    <p id="msg-count">{{ thread.chatmessage_thread.all.count }} messages</p>
                   </div>
                 </div>
               </div>

@@ -1,8 +1,9 @@
-asgiref==3.3.4
+asgiref==3.7.2
 autopep8==2.0.1
 black==22.12.0
 certifi==2020.12.5
 cffi==1.15.1
+channels==4.0.0
 chardet==3.0.4
 charset-normalizer==2.0.12
 click==8.0.1
@@ -13,7 +14,7 @@ csscompressor==0.9.5
 defusedxml==0.7.1
 diff-match-patch==20200713
 dj-database-url==0.5.0
-Django==3.2.18
+Django==4.0
 django-channels==0.7.0
 django-environ==0.9.0
 django-extensions==3.2.3
@@ -84,6 +85,7 @@ tablib==3.3.0
 threadpoolctl==3.0.0
 tomli==2.0.1
 tqdm==4.60.0
+typing_extensions==4.6.3
 tzdata==2022.7
 urllib3==1.26.5
 watchdog==2.3.0

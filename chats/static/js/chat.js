@@ -12,10 +12,7 @@ if (loc.protocol == 'https:') {
 
 let endpoint = wsStart + loc.host + loc.pathname;
 
-console.log("something ","socket");
 const socket = new WebSocket(endpoint);
-
-console.log("something",socket);
 
 socket.onopen = async function (e) { //called when socket connection is opened,so js inside of it can run line by line as normal js till connection is open
     console.log("Socket opened");
@@ -111,6 +108,7 @@ function newMessage(message, sent_by_id, thread_id, thread_user1_id, thread_user
         `
     }
     let msg_body = $(`.messages-wrapper[chat-id="${chat_id}"] .msg_card_body`);
+    $('#msg-count').html(parseInt($('#msg-count').html()) + 1 + " messages");
     msg_body.append($(message_element))
     msg_body.animate({
         scrollTop: $(document).height()
