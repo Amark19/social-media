@@ -1,14 +1,49 @@
+<style>
+  .post-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.3);
+    display: none;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .post-overlay i,
+  .post-overlay span {
+    color: white;
+    margin-bottom: 5px;
+  }
+  
+  .post:hover .post-overlay {
+    display: flex;
+  }
+  
+  .post {
+    position: relative;
+  }
+</style>
 {% if post_data|length > 0 %}
   <div class="row my-4">
     {% for post in post_data %}
-      <div class="col-md-4 mt-3 post">
-          <a href="/post/{{post.post_id}}">
-            <div class="text-white bg-light rounded-3 d-flex justify-content-center align-items-center" style="height:300px;">
-              <img src="/media/{{ post.media }}" alt="loading-post" style="max-height: 100%;
+      <div class="col-md-4 col-sm-6 mt-3 post">
+        <a href="/post/{{ post.post_id }}">
+          <div class="text-white bg-light rounded-3 d-flex justify-content-center align-items-center post-sub" style="height:300px;">
+            <img src="{{ post.media }}" alt="loading-post" style="max-height: 100%;
               max-width: 100%;
               background-repeat: no-repeat;
               background-position: center;" />
-            </div>
+
+              <div class="post-overlay text-dark">
+                <i class="fas fa-solid fa-heart"></i> <!-- Likes icon -->
+                <span class="mx-1 likes">{{post.likes}}</span> <!-- Likes count -->
+                <i class="fas fa-solid fa-comment mx-2"></i> <!-- Comments icon -->
+                <span class="comments">{{post.comments}}</span> <!-- Comments count -->
+              </div>
+          </div>
         </a>
       </div>
     {% endfor %}

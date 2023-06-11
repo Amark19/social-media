@@ -1,89 +1,103 @@
+<style>
+  @media (max-width: 768px) {
+    #Profilephoto {
+      width: 150px;
+    }
+  }
+</style>
 {% extends 'usersettings/index.html' %}
 {% block title %}
 edit profile
 {% endblock %}
-{% block css %}
-{% endblock %}
 {% block main-section %}
 {% if isupdate %}
-<div class="alert alert-warning alert-dismissible fade mt-5 show" role="alert">
-  Hey <strong> {{request.user}}, </strong> Your details update successfully.
-  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+<div id="edit-profile">
+
+  <div class="alert alert-warning alert-dismissible fade  show" role="alert">
+    Hey <strong> {{ request.user }}, </strong> Your details updated successfully.
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+  {% endif %}
+  <form enctype="multipart/form-data">
+    <div class="row mb-3 edit-header">
+      <img src="/media/{{profile_pic}}" class="img-fluid rounded-circle col-sm-2"  id="Profilephoto" alt="">
+      <div class="col-sm-10 text-dark ">
+        <p class="lead">{{request.user}}</p>
+        <div class="input-group mb-2">
+          <input type="file" id="upload" accept="image/png,image/jpg,image/jpeg" name="pic" hidden>
+          <label for="upload" class="btn btn-sm btn-outline-primary">Change Profile Pic</label>
+          <span class="text-muted ml-2" id="pic_name"></span>
+        </div>
+      </div>
+    </div>
+  </form>
+  
+  <form action="/accounts/edit/" method="post" class="text-dark my-2">
+    <div class="row mb-3">
+      <label for="inputEmail3" class="col-sm-2 col-form-label">Name :</label>
+      <div class="col-sm-10">
+        <input type="text" class="form-control" name="name" id="exampleFormControlInput1" value="{{user_data.name}}"
+        placeholder="Enter name">
+      </div>
+    </div>
+    <div class="row mb-3">
+      <label for="inputPassword3" class="col-sm-2 col-form-label">Bio:</label>
+      <div class="col-sm-10">
+        <textarea class="form-control" name="bio" id="exampleFormControlTextarea1"
+        rows="3">{{user_data.user_desc}}</textarea>
+      </div>
+    </div>
+    <div class="row mb-3">
+      <label for="inputEmail3" class="col-sm-2 col-form-label">Email :</label>
+      <div class="col-sm-10">
+        <input type="email" class="form-control" name="email" id="exampleFormControlInput1"
+        value="{{user_data.user_email}}" placeholder="Email Address">
+      </div>
+    </div>
+    <div class="row mb-3">
+      <label for="inputEmail3" class="col-sm-2 col-form-label">Phone Number :</label>
+      <div class="col-sm-10">
+        <input type="number" class="form-control" name="phoneN" id="exampleFormControlInput1"
+        value="{{user_data.user_phone}}" placeholder="Phone Number">
+      </div>
+    </div>
+    <div class="row mb-3 ">
+      <div  class="col-sm-2 col-form-label"></div>
+      <div class="col-sm-10 my-2">
+        <button type="submit" class="btn btn-primary ">Update</button>
+      </div>
+    </div>
+  </form>
 </div>
-{% endif %}
-<form enctype="multipart/form-data">
-  <div class="row">
-    <div class="col-md-3">
-      <img src="/media/{{profile_pic}}" class="img-fluid" width="120px" height="120px" id="Profilephoto"
-        style="border-radius: 50px;" alt="">
 
-    </div>
-    <div class="col-md-4 my-3">
-      <h3>{{request.user}}</h3>
-      <input type="file" id="upload" accept="image/png,image/jpg,image/jpeg" name="pic" onchange="imageUpload()"
-        hidden />
-      <label for="upload" class="text-center  btn btn-outline-primary mb-2">change profile pic</label>
-      <small class="text-muted text-center" id="pic_name"></small>
-      <a class="text-center mx-4 my-2" type="" name="removeP" href="">Remove photo</a>
-    </div>
-  </div>
-</form>
-<form action="/accounts/edit/" method="post">
-  <div class="my-5">
-    <label for="exampleFormControlInput1" class="form-label">Name:</label>
-    <input type="text" class="form-control" name="name" id="exampleFormControlInput1" value="{{user_data.0.name}}"
-      placeholder="Enter name">
-  </div>
-  <div class="mb-3">
-    <label for="exampleFormControlTextarea1" class="form-label">Bio:</label>
-    <textarea class="form-control" name="bio" id="exampleFormControlTextarea1"
-      rows="3">{{user_data.0.user_desc}}</textarea>
-  </div>
-  <div class="mb-3">
-    <label for="exampleFormControlInput1" class="form-label">Email Address:</label>
-    <input type="email" class="form-control" name="email" id="exampleFormControlInput1"
-      value="{{user_data.0.user_email}}" placeholder="Email Address">
-  </div>
-  <div class="mb-3">
-    <label for="exampleFormControlInput1" class="form-label">Phone number:</label>
-    <input type="number" class="form-control" name="phoneN" id="exampleFormControlInput1"
-      value="{{user_data.0.user_phone}}" placeholder="Email Address">
-  </div>
-  <button class="btn btn-primary" type="submit">update</button>
-
-</form>
 {% endblock %}
 {% block JS %}
-$(".nav .nav-link").on("click", function(){
-$(".nav").find(".active").removeClass("active");
-$(this).addClass("active");
+
+function closeModal(e) {
+  $('#exampleModal').modal('hide');
+  e.preventDefault();
+}
+
+$("#upload").change(function (e) {
+  var file = e.target.files[0];
+  console.log(file)
+  if (file.value != "") {
+    var data = new FormData();
+    data.append('image', file);
+    console.log("done")
+    $.ajax({
+      type: 'POST',
+      url: '/accounts/edit/',
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      encode: true,
+      success: function (response) {
+        window.location.reload();
+      },
+    });
+  }
 });
 
-function closeModal(e){
-$('#exampleModal').modal('hide');
-e.preventDefault();
-}
-
-function imageUpload(){
-console.log("done")
-var file = document.getElementById('upload');
-
-if(file.value!=""){
-var data = new FormData();
-data.append('image', file.files[0]);
-$.ajax({
-type: 'POST',
-url: '/accounts/edit/',
-data:data,
-cache: false,
-contentType: false,
-processData: false,
-encode:true,
-success: function (response) {
-window.location.reload();
-},
-});
-}
-
-}
-{% endblock %}
+{% endblock  %}

@@ -108,6 +108,7 @@ function newMessage(message, sent_by_id, thread_id, thread_user1_id, thread_user
         `
     }
     let msg_body = $(`.messages-wrapper[chat-id="${chat_id}"] .msg_card_body`);
+    $('#msg-count').html(parseInt($('#msg-count').html()) + 1 + " messages");
     msg_body.append($(message_element))
     msg_body.animate({
         scrollTop: $(document).height()
