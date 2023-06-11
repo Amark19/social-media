@@ -11,16 +11,20 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+import environ
+# Initialise environment variables
+env = environ.Env()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '6i(tk1o*w#vp@@rnrsh=b7i-@xhly(ncmxk$dzl14c!_0i=-f2'
+SECRET_KEY = os.environ['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -31,6 +35,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'channels',
     'user.apps.UserConfig',
     'posts.apps.PostsConfig',
@@ -47,6 +52,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -74,6 +80,8 @@ TEMPLATES = [
 
 
 ASGI_APPLICATION = 'socialMedia.asgi.application'
+WSGI_APPLICATION = 'socialMedia.wsgi.application'
+
 
 
 # Database
@@ -81,12 +89,18 @@ ASGI_APPLICATION = 'socialMedia.asgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        # 'ENGINE': 'django.db.backends.sqlite3',
+        # 'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': f'{os.environ["NAME"]}',
+        'USER': f'{os.environ["USER"]}',
+        'PASSWORD': f'{os.environ["PASSWORD"]}',
+        'HOST': f'{os.environ["HOST"]}',
+        'PORT': f'{os.environ["PORT"]}',
     }
 }
 
-
+CSRF_TRUSTED_ORIGINS = ['https://*.amardev.tech','https://web-production-dadc.up.railway.app']
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 
@@ -124,10 +138,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"),
-
-]
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATIC_ROOT =os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE="whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Base url to serve media files
 MEDIA_URL = '/media/'
@@ -138,9 +151,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer",
-        # "CONFIG": {
-        #     "hosts": [("127.0.0.1",6379)],
-        # },
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [(f"{os.environ['REDIS_ENDPOINT']}")],
+        },
     }
 }

@@ -67,9 +67,9 @@
     <main class="form-signin">
       <form action="/register" method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        <img class="mr-5" style="margin-left: -10px;" src="/static/ok1.png" alt="" width="300" height="150" />
+        <img class="rounded-circle img-fluid d-block mx-auto"  src="/static/logo.png" alt="" width="150" height="150">
         <div id="register-div">
-          <h1 class="h3 mb-3 fw-normal">Register Here</h1>
+          <h1 class="h3 my-3 fw-normal text-center">Register Here</h1>
 
           <div class="form-floating my-4">
             <input type="text" class="form-control" id="username" name="username" onkeyup="checkForUsernme()" placeholder="Enter the username" required />
@@ -196,7 +196,6 @@ function passwordmatch(){
 
 function allvalidate(){
     if( isusernm==1 && ispass==1 && isconfp==1){
-      console.log("done")
         document.getElementById('register').disabled = false;
     }
     

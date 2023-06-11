@@ -14,7 +14,8 @@
     crossorigin="anonymous"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script> 
   <script src="https://kit.fontawesome.com/1c4d438568.js" crossorigin="anonymous"></script>
-<link rel="stylesheet" href="/static/navbar.css">
+  <link rel="stylesheet" href="/static/navbar.css">
+  <link rel="shortcut icon" type="image/x-icon" href="/static/favicon.ico" />
 </head>
 <style>
   a {
@@ -151,8 +152,8 @@
       <div class="container">
         <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
           <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-5 text-dark text-decoration-none">
-            <img class="bi pt-2 img-container" src="/static/logo-1.png" width="50" height="55">
-            <span class="fs-4 mx-2">MapBook</span>
+            <img class=" img-container" src="/static/logo-1.png" width="60" height="60">
+            <span class="fs-4 ">LinkBook</span>
           </a>
       
           <div class="col-12 col-lg-6 mr-0 me-lg-3 search-container">
@@ -207,7 +208,6 @@
   const img = document.getElementById("media-image");
   const video = document.getElementById("media-video");
   const curLoc = window.location;
-  console.log(curLoc.pathname);
   if(curLoc.href.includes('chat')){
     $('#home').removeClass('active');
     $('#chat').addClass('active');
@@ -223,7 +223,6 @@
 
   function mediaUpld() {
     $('#media-preview').show();
-    console.log(input.files[0].type);
     if (input.files[0].type == 'video/mp4') {
       $('#media-video').show();
       video.src = URL.createObjectURL(input.files[0]);

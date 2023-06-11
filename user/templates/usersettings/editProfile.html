@@ -80,11 +80,9 @@ function closeModal(e) {
 
 $("#upload").change(function (e) {
   var file = e.target.files[0];
-  console.log(file)
   if (file.value != "") {
     var data = new FormData();
     data.append('image', file);
-    console.log("done")
     $.ajax({
       type: 'POST',
       url: '/accounts/edit/',
