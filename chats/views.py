@@ -5,7 +5,7 @@ from user.utils import user_data
 
 
 # Create your views here.
-@login_required
+@login_required(login_url='login')
 def home(request):
     threads = Thread.objects.by_user(user=request.user).prefetch_related('chatmessage_thread').order_by('-timestamp')
     context = {

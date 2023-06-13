@@ -58,6 +58,7 @@ function doneTyping() {
       }
       else {
         $('.search-results').empty();
+        console.log(data);
         data.map((user, index) => {
           $('.search-results').append
             (`
@@ -65,7 +66,7 @@ function doneTyping() {
 
               <div class="d-flex flex-row align-items-center mx-2">
                 <div class="p-1 rounded-circle border-1 border border-secondary">
-                  <img class="rounded-circle " width="32" height="32px" src="${user.user_pic != "False" ? '/media/' + user.user_pic : '/static/avatar.png'}" alt="avatar"
+                  <img class="rounded-circle " width="32" height="32px" src="${user.user_pic != "False" ?  user.user_pic : '/static/avatar.png'}" alt="avatar"
                     style="object-fit: cover;" />
                 </div>
                 <div class="d-flex flex-column my-1 mb-2">

@@ -20,12 +20,12 @@ edit profile
   {% endif %}
   <form enctype="multipart/form-data">
     <div class="row mb-3 edit-header">
-      <img src="/media/{{profile_pic}}" class="img-fluid rounded-circle col-sm-2"  id="Profilephoto" alt="">
+      <img src="{{profile_pic.url}}" class="img-fluid rounded-circle col-sm-2"  id="Profilephoto" alt="">
       <div class="col-sm-10 text-dark ">
         <p class="lead">{{request.user}}</p>
         <div class="input-group mb-2">
           <input type="file" id="upload" accept="image/png,image/jpg,image/jpeg" name="pic" hidden>
-          <label for="upload" class="btn btn-sm btn-outline-primary">Change Profile Pic</label>
+          <label for="upload" id="upload-pic" class="btn btn-sm btn-outline-primary">Change Profile Pic</label>
           <span class="text-muted ml-2" id="pic_name"></span>
         </div>
       </div>
@@ -80,6 +80,8 @@ function closeModal(e) {
 
 $("#upload").change(function (e) {
   var file = e.target.files[0];
+  $("#upload-pic").html("Uploading..");
+  $("#upload-pic").prop("disabled", true);
   if (file.value != "") {
     var data = new FormData();
     data.append('image', file);

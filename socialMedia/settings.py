@@ -37,6 +37,7 @@ ALLOWED_HOSTS = ['*']
 INSTALLED_APPS = [
     'daphne',
     'channels',
+    'storages',
     'user.apps.UserConfig',
     'posts.apps.PostsConfig',
     'chats.apps.ChatsConfig',
@@ -137,7 +138,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATIC_ROOT =os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE="whitenoise.storage.CompressedManifestStaticFilesStorage"
@@ -148,6 +149,18 @@ MEDIA_URL = '/media/'
 # Path where media is stored
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
+
+#aws s3 bucket settings
+AWS_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']
+AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
+AWS_STORAGE_BUCKET_NAME = os.environ['AWS_STORAGE_BUCKET_NAME']
+AWS_S3_REGION_NAME = 'us-east-2'
+AWS_S3_FILE_OVERWRITE = False
+AWS_DEFAULT_ACL =  'private'
+AWS_S3_VERITY = True
+AWS_S3_ADDRESSING_STYLE = "virtual"
+AWS_S3_ENDPOINT_URL = 'https://s3.us-east-2.amazonaws.com'
+DEFAULT_FILE_STORAGE=os.environ['DEFAULT_FILE_STORAGE']
 
 CHANNEL_LAYERS = {
     "default": {

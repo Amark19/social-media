@@ -13,6 +13,7 @@ from django.contrib import messages
 from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate, login, logout
+from django.core.files.storage import default_storage
 from .models import userData, userFollowers
 from chats.models import Thread
 from posts.models import Post, Comment
@@ -78,9 +79,11 @@ def register(request):
         phoneno = request.POST['phonen']
         date = request.POST['bdate']
         pic = request.FILES.get('pic', False)
-        pic.name = username+'.jpg'
-        userData.objects.create(user_name=str(username), name=name, user_desc=bio,
-                                user_email=email, user_phone=str(phoneno), user_birthday=date, user_pic=pic)
+        pic.name = username+'.jpg' 
+        compressed_media = user_data.compress_and_save_image(pic)
+        user = userData.objects.create(user_name=str(username), name=name, user_desc=bio,
+                                user_email=email, user_phone=str(phoneno), user_birthday=date)
+        user.user_pic.save(pic.name, compressed_media)
         isregister = True
         login(request, authenticate(username=username, password=passw))
         return redirect('/')
@@ -140,8 +143,8 @@ def home(request):
     feed_utils.get_feed_posts(other_users, feed_results, 'other')
     feed_response = feed_utils.manage_feed(
         feed_results[:min(len(feed_results), threshold_per_page)])
-
-    return render(request, 'feed/posts.html', {'user_data': userObj(username), 'profile_pic': userObj(username)['user_pic'], 'feed_results': feed_response})
+    profile_pic = userData.objects.get(user_name=username).user_pic
+    return render(request, 'feed/posts.html', {'user_data': userObj(username), 'profile_pic': profile_pic, 'feed_results': feed_response})
 
 
 @login_required(login_url='login')
@@ -154,14 +157,15 @@ def profile(request, username):
         post_data = feed_utils.manage_feed(Post.objects.filter(
             username=username).order_by('-date_posted'))
         posts_length = len(post_data)
+        profile_pic = userData.objects.get(user_name=request.user.username).user_pic
         if username == request.user.username:
-            profile_pic = userObj(username)['user_pic']
+            searchedUserPic = profile_pic
         else:
-            profile_pic = userObj(request.user.username)['user_pic']
+            searchedUserPic = userData.objects.get(user_name=username).user_pic
         followers = userFollowers.objects.filter(follower=userQuery)
         following = userFollowers.objects.filter(following=userQuery)
         isAuthUserFollows = followers.filter(following=authUserQuery).exists()
-        return render(request, 'profile/index.html', {'user_data': userObj(username), 'post_data': post_data, 'followers': [followers, following, isAuthUserFollows], 'post_length': str(posts_length), 'profile_pic': profile_pic, 'searchedUserPic': userObj(username)['user_pic']})
+        return render(request, 'profile/index.html', {'user_data': userObj(username), 'post_data': post_data, 'followers': [followers, following, isAuthUserFollows], 'post_length': str(posts_length), 'profile_pic': profile_pic, 'searchedUserPic': searchedUserPic})
     else:
         return HttpResponse("404 not found")
 
@@ -169,13 +173,17 @@ def profile(request, username):
 @login_required(login_url='login')
 @csrf_exempt
 def edit_profile(request):
+    profile_pic = userData.objects.get(user_name=request.user.username).user_pic
     if request.method == 'POST':
         if 'image' in request.FILES:
-            from PIL import Image
-            pic = request.FILES['image']
-            Image.open(pic).save('media/' + pic.name)
+            pic = request.FILES.get('image', False)
+            pic.name = request.user.username + '.jpg'
+            file_path = 'images/' + pic.name
+            compressed_img = user_data.compress_and_save_image(pic)
+            default_storage.delete(file_path)
+            default_storage.save(file_path, compressed_img)
             userData.objects.filter(user_name=request.user.username).update(
-                user_pic=pic)
+                user_pic=file_path)
         elif 'name' in request.POST:
             name = request.POST['name']
             bio = request.POST['bio']
@@ -183,9 +191,9 @@ def edit_profile(request):
             phoneN = request.POST['phoneN']
             userData.objects.filter(user_name=request.user.username).update(
                 name=name, user_desc=bio, user_email=email, user_phone=phoneN)
-        return render(request, 'usersettings/editProfile.html', {'user_data': userObj(request.user.username), 'profile_pic':  userObj(request.user.username)['user_pic'], 'isupdate': True})
+        return render(request, 'usersettings/editProfile.html', {'user_data': userObj(request.user.username), 'profile_pic':  profile_pic ,'isupdate': True})
 
-    return render(request, 'usersettings/editProfile.html', {'user_data':  userObj(request.user.username), 'profile_pic':  userObj(request.user.username)['user_pic'], 'isupdate': False})
+    return render(request, 'usersettings/editProfile.html', {'user_data':  userObj(request.user.username), 'profile_pic':  profile_pic, 'isupdate': False})
 
 
 def changePassword(request):
@@ -202,7 +210,7 @@ def changePassword(request):
             return render(request, 'usersettings/changepassword.html', {'profile_pic': userObj(request.user.username)['user_pic'], 'ispassValid': True})
     return render(request, 'usersettings/changepassword.html', {'profile_pic': userObj(request.user.username)['user_pic'], 'ispassValid': False})
 
-
+@login_required(login_url='login')
 def chatTo(request, username):
     user2 = get_user_model().objects.get(username=username)
     if not Thread.objects.filter(Q(user1=request.user, user2=user2) | Q(user1=user2, user2=request.user)).exists():
@@ -247,6 +255,7 @@ def SearchUser(request):
                     Q(user_name__icontains=username) | Q(name__icontains=username)).exclude(user_name=request.user.username)
                 for user in all_users:
                     tmpUserObj = userObj(user.user_name)
+                    tmpUserObj['user_pic'] = user.user_pic.url
                     if tmpUserObj in response:
                         continue
                     is_following = userFollowers.objects.filter(
@@ -266,7 +275,6 @@ def SearchUser(request):
 
             response = sorted(response, key=lambda user: (
                 user['is_following'], user['is_followed']), reverse=True)[:usersThreshold]
-
         if len(response) == 0:
             response = "NoUserFound"
 

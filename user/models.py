@@ -8,7 +8,7 @@ class userData(models.Model):
     user_desc = models.CharField(max_length=500)
     user_phone = models.CharField(max_length=30)
     user_birthday = models.DateField()
-    user_pic = models.ImageField(upload_to='images',blank=True)
+    user_pic = models.FileField(upload_to='images',blank=True)
     def __str__(self):
         return self.user_name
     

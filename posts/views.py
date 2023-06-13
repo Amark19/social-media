@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, HttpResponse
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
+from django.core.files.storage import default_storage
 from .models import Post, Comment
 from user.models import userData
 import json
@@ -18,7 +19,7 @@ def get_comments_data(all_comments):
             'comment': all_comments[i].comment,
             'created_date': all_comments[i].created_date,
             'user_name': all_comments[i].user.username,
-            'user_pic': userData.objects.values('user_pic').filter(user_name=all_comments[i].user.username)[0]['user_pic'],
+            'user_pic':userData.objects.get(user_name=all_comments[i].user.username).user_pic.url,
             'time_ago': time_diff.time_diff(datetime.now(timezone.utc), all_comments[i].created_date)
         })
     return comments_data
@@ -29,18 +30,17 @@ def create_post(request):
     if request.method == 'POST':
         content = request.POST.get('content')
         media = request.FILES.get('media', False)
-        post = Post(content=content, media=media,
-                    user=request.user, username=request.user.username)
+        compressed_media = user_data.compress_and_save_image(media)
+        post = Post(content=content, user=request.user, username=request.user.username)
+        post.media.save(media.name, compressed_media)
         post.save()
         return redirect(f'/{request.user}/')
 
 
 @login_required(login_url='login')
 def update_post(request):
-    print(request)
     if request.method == "POST":
         post_id, update_type = request.POST['data[post_id]'], request.POST['data[update_type]']
-        print(post_id, update_type)
         post = Post.objects.get(post_id=post_id)
         if update_type == 'like':
             if post.likes.filter(id=request.user.id).exists():
@@ -66,21 +66,20 @@ def update_post(request):
 @login_required(login_url='login')
 def view_post(request, post_id):
     post = Post.objects.get(post_id=post_id)
-    userObj = user_data.get_user_data(post.username)[0]  # searched user name
-    authorObj = user_data.get_user_data(request.user.username)[
-        0]  # logged in user name
-    print(post.user)
+    userObj = userData.objects.get(user_name=post.username)
     post_json = serializers.serialize(
         'json', [post,])
     if post.likes.filter(id=request.user.id).exists():
         is_like = 1
     else:
         is_like = 0
-    return render(request, 'viewPost.html', {'post': post, 'post_json': post_json, 'user_data': userObj, 'profile_pic': authorObj['user_pic'], 'is_like': is_like, 'comments_data': get_comments_data(Comment.objects.filter(post=post).all())})
+    profile_pic = userData.objects.get(user_name=request.user.username).user_pic
+    return render(request, 'viewPost.html', {'post': post, 'post_json': post_json, 'user_data': userObj, 'profile_pic': profile_pic, 'is_like': is_like, 'comments_data': get_comments_data(Comment.objects.filter(post=post).all())})
 
 
 @login_required(login_url='login')
 def delete_post(request, post_id):
     post = Post.objects.get(post_id=post_id)
     post.delete()
+    default_storage.delete(post.media.name)
     return redirect(f'/{request.user}/')

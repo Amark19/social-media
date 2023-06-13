@@ -54,7 +54,7 @@ background: #C0C0C0;
     <div class="row border border-1">
         <div class="col-md-7 bg-light border border-1">
             <div class="text-white rounded-3 d-flex justify-content-center align-items-center" style="height:600px;">
-                <img src="/media/{{ post.media }}" alt="loading-post" style="max-height: 100%;
+                <img src="{{ post.media.url }}" alt="loading-post" style="max-height: 100%;
                 max-width: 100%;
                 background-repeat: no-repeat;
                 background-position: center;" />
@@ -63,7 +63,7 @@ background: #C0C0C0;
         <div class="col-md-5 border border-1 ">
             <div class="header">
                 <div class="d-flex text-muted pt-3">
-                    <img class="rounded-circle" width="32px" height="32px" src="/media/{{user_data.user_pic}}"
+                    <img class="rounded-circle" width="32px" height="32px" src="{{user_data.user_pic.url}}"
                         style="object-fit: cover;" alt="">
                     <div class="pb-3 mb-2 mx-2 small lh-sm  w-100">
                         <div class="d-flex justify-content-between">
@@ -95,7 +95,7 @@ background: #C0C0C0;
             <div class="body" style="max-height:400px;overflow-y: scroll;overflow-x:hidden;">
                 <div class="caption">
                     <div class="d-flex text-muted pt-3">
-                        <img class="rounded-circle" width="32px" height="32px" src="/media/{{user_data.user_pic}}"
+                        <img class="rounded-circle" width="32px" height="32px" src="{{user_data.user_pic.url}}"
                             style="object-fit: cover;" alt="">
                         <div class="pb-3 mb-2 mx-2 small lh-sm  w-100">
                             <div class="d-flex justify-content-between">
@@ -128,7 +128,7 @@ background: #C0C0C0;
                                 <div class="d-flex justify-content-between">
                                     <div class="d-flex flex-row align-items-center">
                                         <img class="rounded-circle" width="32px" height="32px"
-                                            src="/media/{{ data.user_pic }}" alt="avatar" style="object-fit: cover;" />
+                                            src="{{ data.user_pic }}" alt="avatar" style="object-fit: cover;" />
                                         <a href="/{{data.user_name}}/" class="small mb-0 ms-2 ">{{data.user_name}}</a>
                                     </div>
                                     <div class="d-flex flex-row align-items-center">
