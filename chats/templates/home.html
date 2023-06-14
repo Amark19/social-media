@@ -18,9 +18,9 @@
                   <div class="d-flex bd-highlight">
                     <div class="img_cont">
                       {% if thread.user1 == user %}
-                      <img src="/media/{{thread.user2_profile_pic.user_pic}}" class="rounded-circle user_img">
+                      <img src="{{thread.user2_profile_pic.user_pic.url}}" class="rounded-circle user_img">
                       {% else %}
-                      <img src="/media/{{thread.user1_profile_pic.user_pic}}" class="rounded-circle user_img">
+                      <img src="{{thread.user1_profile_pic.user_pic.url}}" class="rounded-circle user_img">
                       {% endif %}
                     </div>
                     <div class="user_info">
@@ -46,9 +46,9 @@
                 <div class="d-flex bd-highlight">
                   <div class="img_cont">
                     {% if thread.user1 == user %}
-                    <img src="/media/{{thread.user2_profile_pic.user_pic}}" class="rounded-circle user_img">
+                    <img src="{{thread.user2_profile_pic.user_pic.url}}" class="rounded-circle user_img">
                     {% else %}
-                    <img src="/media/{{thread.user1_profile_pic.user_pic}}" class="rounded-circle user_img">
+                    <img src="{{thread.user1_profile_pic.user_pic.url}}" class="rounded-circle user_img">
                     {% endif %}
                   </div>
                   <div class="user_info">
@@ -71,9 +71,9 @@
                   </div>
                   <div class="img_cont_msg">
                     {% if thread.user1 == user %}
-                    <img src="/media/{{thread.user1_profile_pic.user_pic}}" class="rounded-circle user_img_msg">
+                    <img src="{{thread.user1_profile_pic.user_pic.url}}" class="rounded-circle user_img_msg">
                     {% else %}
-                    <img src="/media/{{thread.user2_profile_pic.user_pic}}" class="rounded-circle user_img_msg">
+                    <img src="{{thread.user2_profile_pic.user_pic.url}}" class="rounded-circle user_img_msg">
                     {% endif %}
                   </div>
                 </div>
@@ -81,9 +81,9 @@
                 <div class="d-flex mb-4 received">
                   <div class="img_cont_msg">
                     {% if thread.user1 == user %}
-                    <img src="/media/{{thread.user2_profile_pic.user_pic}}" class="rounded-circle user_img_msg">
+                    <img src="{{thread.user2_profile_pic.user_pic.url}}" class="rounded-circle user_img_msg">
                     {% else %}
-                    <img src="/media/{{thread.user1_profile_pic.user_pic}}" class="rounded-circle user_img_msg">
+                    <img src="{{thread.user1_profile_pic.user_pic.url}}" class="rounded-circle user_img_msg">
                     {% endif %}
                   </div>
                   <div class="msg_cotainer">

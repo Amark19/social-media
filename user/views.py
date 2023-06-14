@@ -197,6 +197,8 @@ def edit_profile(request):
 
 
 def changePassword(request):
+    
+    profile_pic = userData.objects.get(user_name=request.user.username).user_pic
     if request.method == "POST":
         old_pass = request.POST['old_pass']
         new_pass = request.POST['new_pass']
@@ -207,8 +209,8 @@ def changePassword(request):
             user.save()
             return redirect('/login')
         else:
-            return render(request, 'usersettings/changepassword.html', {'profile_pic': userObj(request.user.username)['user_pic'], 'ispassValid': True})
-    return render(request, 'usersettings/changepassword.html', {'profile_pic': userObj(request.user.username)['user_pic'], 'ispassValid': False})
+            return render(request, 'usersettings/changepassword.html', {'profile_pic': profile_pic, 'ispassValid': True})
+    return render(request, 'usersettings/changepassword.html', {'profile_pic': profile_pic, 'ispassValid': False})
 
 @login_required(login_url='login')
 def chatTo(request, username):
