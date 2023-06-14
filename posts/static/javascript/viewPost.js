@@ -32,7 +32,7 @@ $(document).ready(function () {
                             <p>${element.comment}</p>
                             <div class="d-flex justify-content-between">
                                 <div class="d-flex flex-row align-items-center">
-                                    <img class="rounded-circle" width="32px" height="32px" src=/media/${element.user_pic}
+                                    <img class="rounded-circle" width="32px" height="32px" src=${element.user_pic}
                                     alt="avatar" style="object-fit: cover;"/>
                                     <a href="/${element.user_name}/" class="small mb-0 ms-2 ">${element.user_name}</a>
                                 </div>
