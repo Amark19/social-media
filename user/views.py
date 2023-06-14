@@ -167,7 +167,7 @@ def profile(request, username):
         isAuthUserFollows = followers.filter(following=authUserQuery).exists()
         return render(request, 'profile/index.html', {'user_data': userObj(username), 'post_data': post_data, 'followers': [followers, following, isAuthUserFollows], 'post_length': str(posts_length), 'profile_pic': profile_pic, 'searchedUserPic': searchedUserPic})
     else:
-        return HttpResponse("404 not found")
+        return HttpResponse("404 - user not found")
 
 
 @login_required(login_url='login')

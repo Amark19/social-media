@@ -27,7 +27,7 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 SECRET_KEY = os.environ['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ['DEBUG']
+DEBUG = True if os.environ['DEBUG'] == 'True' else False
 
 ALLOWED_HOSTS = ['*']
 
@@ -84,7 +84,12 @@ ASGI_APPLICATION = 'socialMedia.asgi.application'
 WSGI_APPLICATION = 'socialMedia.wsgi.application'
 
 
-CSRF_TRUSTED_ORIGINS = ['https://*.amardev.tech','https://web-production-dadc.up.railway.app']
+# Database
+# https://docs.djangoproject.com/en/3.0/ref/settings/#databases
+
+
+CSRF_TRUSTED_ORIGINS = ['https://*.amardev.tech',
+                        'https://web-production-dadc.up.railway.app']
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 
@@ -121,31 +126,34 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-#aws s3 bucket settings
+# Base url to serve media files
+MEDIA_URL = '/media/'
+
+# Path where media is stored
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+
+
+# aws s3 bucket settings
 AWS_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']
 AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
 AWS_STORAGE_BUCKET_NAME = os.environ['AWS_STORAGE_BUCKET_NAME']
 AWS_S3_REGION_NAME = 'us-east-2'
 AWS_S3_FILE_OVERWRITE = False
-AWS_DEFAULT_ACL = 'public-read'
+AWS_DEFAULT_ACL = 'private'
 AWS_S3_VERITY = True
 AWS_S3_ADDRESSING_STYLE = "virtual"
 AWS_S3_ENDPOINT_URL = 'https://s3.us-east-2.amazonaws.com'
-DEFAULT_FILE_STORAGE=os.environ['DEFAULT_FILE_STORAGE']
-AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
-STATICFILES_STORAGE ='storages.backends.s3boto3.S3StaticStorage'
-AWS_LOCATION = 'static'
-STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/'
-# STATICFILES_DIRS = [
-#     os.path.join(BASE_DIR, 'static'),
-# ]
+DEFAULT_FILE_STORAGE = os.environ['DEFAULT_FILE_STORAGE']
 
-if DEBUG == True :
+if DEBUG:
     DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
         }
     }
     CHANNEL_LAYERS = {
@@ -153,8 +161,18 @@ if DEBUG == True :
             "BACKEND": "channels.layers.InMemoryChannelLayer"
         }
     }
+
 else:
     
+    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {
+                "hosts": [(f"{os.environ['REDIS_ENDPOINT']}")],
+            },
+        }
+    }
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
@@ -163,15 +181,5 @@ else:
             'PASSWORD': f'{os.environ["PASSWORD"]}',
             'HOST': f'{os.environ["HOST"]}',
             'PORT': f'{os.environ["PORT"]}',
-        }
-    }
-
-    
-    CHANNEL_LAYERS = {
-        "default": {
-            "BACKEND": "channels_redis.core.RedisChannelLayer",
-            "CONFIG": {
-                "hosts": [(f"{os.environ['REDIS_ENDPOINT']}")],
-            },
         }
     }
