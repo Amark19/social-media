@@ -3,9 +3,9 @@
 
 {% endblock %}
 {% block body %}
-  <div class="container col-md-6" id="feed-results">
+  <div class="container-fluid col-md-6" id="feed-results" >
     {% for post in feed_results %}
-      <div class="card border-0 shadow rounded my-4 post " id="post-{{forloop.counter}}" style="background-color: white;">
+      <div class="card border-0 shadow rounded mb-4 post " id="post-{{forloop.counter}}" style="background-color: white;">
         <div class="card-header border-0">
           <div class="d-flex align-items-center p-1">
             <img src="{{ post.user_pic }}" class="rounded-circle mr-2 border-2" alt="User Photo" width="40" height="40" />
@@ -70,7 +70,7 @@
   </div>
   <script src="/static/utils/ajax_req.js"></script>
   <script>
-    var is_end = 0;
+    var is_end = 0,somePage = [];
      function load_next_posts (page){
       $.ajax({
         type: 'GET',
@@ -89,7 +89,7 @@
           else{
             response.map((post,index) => {
               $('#feed-results').append(
-                `<div class="card border-0 shadow rounded my-4 post " id="post-${index + page}" style="background-color: white;">
+                `<div class="card border-0 shadow rounded mb-4 post " id="post-${index + page}" style="background-color: white;">
                   <div class="card-header border-0">
                     <div class="d-flex align-items-center p-1">
                       <img src='${ post.user_pic }' class="rounded-circle mr-2 border-2" alt="User Photo" width="40" height="40" />
@@ -146,16 +146,25 @@
       });
       
     } 
-    $(window).scroll(function() {
-      if ($(window).scrollTop() + $(window).height() >= $(document).height()) {
+    $(document).ready(function(){
+      $(document.body).on('touchmove', onScroll);
+      $(window).on('scroll', onScroll);
+      function onScroll(){
+        console.log("scroll");
+        if( $(window).scrollTop() + window.innerHeight >= document.body.scrollHeight ) { 
         var last_post = $('.post').last().attr('id');
         var nextPage = parseInt(last_post.split('-')[1]) + 1;
         if (is_end == 1) {
           return;
         }
+        if(somePage.includes(nextPage)){
+          return;
+        }
         $('.loading').show();
         load_next_posts(nextPage);
+        somePage.push(nextPage);
       }
+    }
     });
     window.onload = function() {
       window.scrollTo(0, 0);

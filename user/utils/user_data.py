@@ -15,7 +15,7 @@ def getUserModelInstance(username):
 
 def compress_and_save_image(image):
     img = Image.open(image)
-    img = img.resize((800, 600))  
+    img = img.resize((1080, 1080))  
     im = ImageOps.exif_transpose(img)
     img_io = BytesIO()
     im = im.convert('RGB')
