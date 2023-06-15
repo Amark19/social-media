@@ -38,10 +38,6 @@ $(document).ready(function () {
                                 </div>
                                 <div class="d-flex flex-row align-items-center">
                                     <p class="small text-muted mb-0">${element.time_ago}</p>
-                                    <a id="like-${index}" type="submit" class="btn-sm"><img src="/static/images/like.svg" width="20px"
-                                        height="20px" alt=""></a>
-                                    <a type="button" class="btn-sm"><img
-                                        src="/static/images/comment.svg" width="20px" height="20px" alt=""></a>
                                 </div>
                             </div>
                         </div>
