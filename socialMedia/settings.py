@@ -88,7 +88,7 @@ WSGI_APPLICATION = 'socialMedia.wsgi.application'
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 
-CSRF_TRUSTED_ORIGINS = ['https://*.amardev.tech',
+CSRF_TRUSTED_ORIGINS = ['https://*.amarkhamkar.com',
                         'https://web-production-dadc.up.railway.app']
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
