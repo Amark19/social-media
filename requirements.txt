@@ -33,8 +33,6 @@ django-storages==1.13.2
 environ==1.0
 et-xmlfile==1.1.0
 flake8==6.0.0
-ginger==0.0.4
-gingerit==0.8.2
 googletrans==4.0.0rc1
 graphviz==0.20.1
 gunicorn==20.1.0
