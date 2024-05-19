@@ -176,6 +176,7 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
+            "OPTIONS": {"options": "-c statement_timeout=10000"},
             'NAME': f'{os.environ["NAME"]}',
             'USER': f'{os.environ["USER"]}',
             'PASSWORD': f'{os.environ["PASSWORD"]}',
