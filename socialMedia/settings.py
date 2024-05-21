@@ -176,11 +176,10 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            "OPTIONS": {"options": "-c statement_timeout=10000"},
-            'NAME': f'{os.environ["NAME"]}',
-            'USER': f'{os.environ["USER"]}',
-            'PASSWORD': f'{os.environ["PASSWORD"]}',
-            'HOST': f'{os.environ["HOST"]}',
-            'PORT': f'{os.environ["PORT"]}',
+            'NAME': f'{os.environ["PGDATABASE"]}',
+            'USER': f'{os.environ["PGUSER"]}',
+            'PASSWORD': f'{os.environ["PGPASSWORD"]}',
+            'HOST': f'{os.environ["PGHOST"]}',
+            'PORT': f'{os.environ["PGPORT"]}',
         }
     }
