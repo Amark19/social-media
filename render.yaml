@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: socialmedia-web
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: daphne socialMedia.asgi:application --port $PORT --bind 0.0.0.0 -v2
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: socialMedia.settings
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALLOWED_HOSTS
+        value: socialmedia.onrender.com
+      - key: DEBUG
+        value: "False"
+
+  - type: worker
+    name: socialmedia-worker
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python manage.py runworker channels --settings=socialMedia.settings -v2
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: socialMedia.settings
