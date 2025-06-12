@@ -13,9 +13,8 @@ def get_feed_posts(users,feed_results,type):
             posts = Post.objects.filter(username=user).order_by('-date_posted')
         if posts.exists():
             selected_post = max((
-                (post,post.likes.count() + Comment.objects.filter(post=post).count())
-                for post in posts
-                if (datetime.now(timezone.utc) - post.date_posted).days <= 30),key=lambda x: x[1],default=None
+                (post, post.likes.count() + Comment.objects.filter(post=post).count())
+                for post in posts), key=lambda x: x[1], default=None
             )
             if selected_post:feed_results.append(selected_post[0])
 
